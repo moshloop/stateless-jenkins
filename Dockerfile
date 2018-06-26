@@ -18,11 +18,10 @@ RUN echo - {hosts: all, roles: [moshloop.java]} > /tmp/play && ansible-playbook 
 RUN wget -qO- -O tmp.zip https://releases.hashicorp.com/packer/1.2.4/packer_1.2.4_linux_amd64.zip && \
     unzip tmp.zip && mv packer /usr/bin/ && chmod +x /usr/bin/packer && rm tmp.zip
 
-RUN chown jenkins:jenkins $JENKINS_HOME/init.groovy.d
-
 USER jenkins
+RUN mkdir -p $JENKINS_HOME/init.groovy.d
+COPY config.groovy $JENKINS_HOME/init.groovy.d/
 COPY plugins.txt $JENKINS_HOME/
 RUN plugins.sh $JENKINS_HOME/plugins.txt
-COPY config.groovy $JENKINS_HOME/init.groovy.d/
 RUN echo $JENKINS_VER > $JENKINS_HOME/jenkins.install.UpgradeWizard.state
 RUN echo $JENKINS_VER > $JENKINS_HOME/jenkins.install.InstallUtil.lastExecVersion
