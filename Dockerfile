@@ -1,5 +1,6 @@
-ARG JENKINS_VER=2.112
+ARG JENKINS_VER=2.129
 FROM jenkins/jenkins:$JENKINS_VER
+ENV JAVA_OPTS=-Djenkins.install.runSetupWizard=false
 ENV JENKINS_VER=$JENKINS_VER
 ENV JENKINS_HOME=/var/jenkins_home
 ENV ANSIBLE_CONFIG /etc/ansible/ansible.cfg
@@ -14,14 +15,12 @@ RUN apt-get update && \
     ansible-galaxy install geerlingguy.docker moshloop.java
 
 RUN echo - {hosts: all, roles: [geerlingguy.docker]} > /tmp/play && ansible-playbook -i "localhost," -c local /tmp/play
-RUN echo - {hosts: all, roles: [moshloop.java]} > /tmp/play && ansible-playbook -i "localhost," -c local /tmp/play -e JVM_ONLY=true
+RUN echo - {hosts: all, roles: [moshloop.java]} > /tmp/play && ansible-playbook -i "localhost," -c local /tmp/play
 RUN wget -qO- -O tmp.zip https://releases.hashicorp.com/packer/1.2.4/packer_1.2.4_linux_amd64.zip && \
     unzip tmp.zip && mv packer /usr/bin/ && chmod +x /usr/bin/packer && rm tmp.zip
-
+RUN chown jenkins:jenkins $JENKINS_HOME
 USER jenkins
 RUN mkdir -p $JENKINS_HOME/init.groovy.d
-COPY config.groovy $JENKINS_HOME/init.groovy.d/
 COPY plugins.txt $JENKINS_HOME/
 RUN plugins.sh $JENKINS_HOME/plugins.txt
-RUN echo $JENKINS_VER > $JENKINS_HOME/jenkins.install.UpgradeWizard.state
-RUN echo $JENKINS_VER > $JENKINS_HOME/jenkins.install.InstallUtil.lastExecVersion
+COPY config.groovy $JENKINS_HOME/init.groovy.d/

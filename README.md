@@ -82,5 +82,17 @@ spec:
         secret:
           secretName: deploy-key
 ```
-Name  |  State  |  Private IP  |  Public IP  |  Type  |  Zone
-------|---------|--------------|-------------|--------|------
+
+
+### To get the latest plugin versions
+
+```groovy
+def plugins = jenkins.model.Jenkins.instance.getPluginManager().getPlugins()
+plugins.each {
+  version = it.getVersion()
+  if (it.getUpdateInfo() != null) {
+    version = it.getUpdateInfo().version
+  }
+  println "${it.getShortName()}:${version}"
+}
+```
