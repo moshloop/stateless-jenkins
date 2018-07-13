@@ -1,5 +1,6 @@
 ace-editor:1.1
 amazon-ecr:1.6
+active-directory:2.8
 ansible:1.0
 ant:1.8
 antisamy-markup-formatter:1.5
@@ -9,6 +10,7 @@ authentication-tokens:1.3
 aws-credentials:1.23
 aws-java-sdk:1.11.341
 azure-commons:0.2.6
+badge:1.5
 basic-branch-build-strategies:1.0.1
 batch-task:1.19
 bitbucket-approve:1.0.3
