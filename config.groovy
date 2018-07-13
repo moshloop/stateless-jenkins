@@ -3,6 +3,7 @@ import jenkins.model.*
 import hudson.security.*
 import hudson.model.*
 import jenkins.install.*
+import java.lang.reflect.*
 import com.cloudbees.plugins.credentials.*
 import com.cloudbees.plugins.credentials.common.*
 import com.cloudbees.plugins.credentials.domains.*
@@ -12,6 +13,7 @@ import javaposse.jobdsl.plugin.JenkinsJobManagement
 import com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey.FileOnMasterPrivateKeySource;
 import com.cloudbees.jenkins.plugins.sshcredentials.impl.*;
 import hudson.util.*
+import com.michelin.cio.hudson.plugins.rolestrategy.*
 
 
 def DEPLOY_KEY = System.getenv()['DEPLOY_KEY']?:"/etc/jenkins/keys/ssh-private"
@@ -62,21 +64,24 @@ location.save()
 
 
 REPO = System.getenv()['REPO']
-ROOT = "/var/jenkins_home/REPO/"
-def process = new ProcessBuilder([ "bash", "-c",
-                                  "GIT_SSH_COMMAND='ssh -i /etc/jenkins/keys/ssh-private -oStrictHostKeyChecking=no' git clone $REPO $ROOT".toString()])
-                                  .redirectErrorStream(true)
-                                  .start()
-process.consumeProcessOutput(System.out, System.err)
-process.waitForOrKill(60000)
+
+if (REPO != null) {
+    ROOT = "/var/jenkins_home/REPO/"
+    def process = new ProcessBuilder([ "bash", "-c",
+                                      "GIT_SSH_COMMAND='ssh -i /etc/jenkins/keys/ssh-private -oStrictHostKeyChecking=no' git clone $REPO $ROOT".toString()])
+                                      .redirectErrorStream(true)
+                                      .start()
+    process.consumeProcessOutput(System.out, System.err)
+    process.waitForOrKill(60000)
 
 
-def jobDslScript = new File(ROOT, "Jenkinsfile.job")
-if (jobDslScript.exists()) {
-    println("Found Jenkinsfile.job, creating jobs using jobs-dsl")
-    def workspace = new File('.')
-    def jobManagement = new JenkinsJobManagement(System.out, [:], workspace)
-    new DslScriptLoader(jobManagement).runScript(jobDslScript.text)
+    def jobDslScript = new File(ROOT, "Jenkinsfile.job")
+    if (jobDslScript.exists()) {
+        println("Found Jenkinsfile.job, creating jobs using jobs-dsl")
+        def workspace = new File('.')
+        def jobManagement = new JenkinsJobManagement(System.out, [:], workspace)
+        new DslScriptLoader(jobManagement).runScript(jobDslScript.text)
+    }
 }
 
 import hudson.security.LDAPSecurityRealm
@@ -84,20 +89,21 @@ import hudson.util.Secret
 import jenkins.model.IdStrategy
 import jenkins.security.plugins.ldap.LDAPConfiguration
 import static hudson.security.LDAPSecurityRealm.DescriptorImpl.*
+import hudson.plugins.active_directory.*
 
 def LDAP_SERVER = System.getenv()['LDAP_SERVER']?:""
 def LDAP_USER = System.getenv()['LDAP_USER']
 def LDAP_PASS = System.getenv()['LDAP_PASS']
-def LDAP_DOMAIN = System.getenv()['LDAP_DOMAIN']
+def LDAP_ROOT = System.getenv()['LDAP_ROOT']
 
 
 if( LDAP_SERVER != "" && !(jenkins.securityRealm instanceof LDAPSecurityRealm)) {
     println("Configuring LDAP authentication")
-    LDAPConfiguration conf = new LDAPConfiguration(LDAP_SERVER, LDAP_DOMAIN, false,'', Secret.fromString(LDAP_PASS));
-    conf.userSearchBase = System.getenv()['LDAP_SEARCH_BASE']
+    LDAPConfiguration conf = new LDAPConfiguration(LDAP_SERVER, LDAP_ROOT, true,LDAP_USER, Secret.fromString(LDAP_PASS));
+    conf.userSearchBase = System.getenv()['LDAP_SEARCH_BASE']?:""
     conf.userSearch =  System.getenv()['LDAP_USER_SEARCH']?:DEFAULT_USER_SEARCH
-    conf.groupSearchBase = System.getenv()['LDAP_GROUP_SEARCH_BASE']
-    conf.groupSearchFilter = System.getenv()['LDAP_GROUP_SEARCH']
+    conf.groupSearchBase = System.getenv()['LDAP_GROUP_SEARCH_BASE']?:""
+    conf.groupSearchFilter = System.getenv()['LDAP_GROUP_SEARCH']?:""
     conf.displayNameAttributeName = System.getenv()['LDAP_DISPLAY_NAME']?:DEFAULT_DISPLAYNAME_ATTRIBUTE_NAME
     conf.mailAddressAttributeName = System.getenv()['LDAP_MAIL_NAME']?:DEFAULT_MAILADDRESS_ATTRIBUTE_NAME
     jenkins.securityRealm = new LDAPSecurityRealm(
@@ -108,3 +114,41 @@ if( LDAP_SERVER != "" && !(jenkins.securityRealm instanceof LDAPSecurityRealm)) 
             IdStrategy.CASE_INSENSITIVE)
     jenkins.save()
 }
+
+
+def AD_SERVER = System.getenv()['AD_SERVER']?:""
+
+if (AD_SERVER != "" && !(jenkins.securityRealm instanceof ActiveDirectorySecurityRealm)) {
+    jenkins.securityRealm = new ActiveDirectorySecurityRealm(
+        System.getenv()['AD_DOMAIN'],
+        System.getenv()['AD_SITE'],
+        System.getenv()['AD_USER'],
+        System.getenv()['AD_PASS'],
+        AD_SERVER
+    )
+    jenkins.save()
+}
+
+    RoleBasedAuthorizationStrategy roles = new RoleBasedAuthorizationStrategy()
+    jenkins.setAuthorizationStrategy(roles)
+
+    Constructor[] constrs = Role.class.getConstructors();
+    for (Constructor<?> c : constrs) {
+      c.setAccessible(true);
+    }
+
+    RoleBasedAuthorizationStrategy.class.getDeclaredMethod("assignRole", String.class, Role.class, String.class).setAccessible(true);
+
+    Role adminRole = new Role('admin',new HashSet(Permission.all));
+    roles.addRole(RoleBasedAuthorizationStrategy.GLOBAL, adminRole);
+    roles.assignRole(RoleBasedAuthorizationStrategy.GLOBAL, adminRole, System.getenv()['ADMIN_GROUP']?:"Jenkins Admins");
+
+    Set<Permission> readOnly = new HashSet<Permission>();
+    readOnly.add(Permission.fromId("hudson.model.Hudson.Read"));
+    readOnly.add(Permission.fromId("hudson.model.View.Read"));
+
+    Role authenticatedRole = new Role('read', readOnly);
+    roles.addRole(RoleBasedAuthorizationStrategy.GLOBAL, authenticatedRole);
+    roles.assignRole(RoleBasedAuthorizationStrategy.GLOBAL, authenticatedRole, System.getenv()['READ_GROUP']?:"authenticated");
+
+    jenkins.save()

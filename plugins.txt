@@ -129,6 +129,7 @@ scm-sync-configuration:0.0.10
 script-security:1.44
 seed:2.1.4
 slack:2.3
+skip-certificate-check:1.0
 sse-gateway:1.15
 ssh-credentials:1.14
 ssh:2.6.1

@@ -34,6 +34,17 @@ Jenkins installed to: `/usr/share/jenkins`
 | JAVA_OPTS        | No       | JVM Arguments                            |
 | JENKINS_OPTS     | No       | JVM Arguments                            |
 | JENKINS_SLAVE_AGENT_PORT        | No       | Defaults to `50001`       |
+| LDAP_SERVER |  |  |
+| LDAP_USER |  |  |
+| LDAP_PASS |  |  |
+| LDAP_ROOT_DN |  |  |
+| AD_SERVER |  |  |
+| AD_DOMAIN |  |  |
+| AD_SITE |  |  |
+| AD_USER |  |  |
+| AD_PASS |  |  |
+| READ_GROUP |  | authenticated |
+| ADMIN_GROUP |  | Jenkins Admins |
 
 
 ### Running using docker
