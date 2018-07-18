@@ -63,24 +63,25 @@ location.save()
 // }
 
 
-REPO = System.getenv()['REPO']
+REPOS = System.getenv()['REPO']
 
-if (REPO != null) {
-    ROOT = "/var/jenkins_home/REPO/"
-    def process = new ProcessBuilder([ "bash", "-c",
-                                      "GIT_SSH_COMMAND='ssh -i ${DEPLOY_KEY} -oStrictHostKeyChecking=no' git clone $REPO $ROOT".toString()])
-                                      .redirectErrorStream(true)
-                                      .start()
-    process.consumeProcessOutput(System.out, System.err)
-    process.waitForOrKill(60000)
+if (REPOS != null) {
+    REPOS.split(",").each {REPO ->
+        ROOT = "/var/jenkins_home/$REPO/"
+        def process = new ProcessBuilder([ "bash", "-c",
+                                          "GIT_SSH_COMMAND='ssh -i ${DEPLOY_KEY} -oStrictHostKeyChecking=no' git clone $REPO $ROOT".toString()])
+                                          .redirectErrorStream(true)
+                                          .start()
+        process.consumeProcessOutput(System.out, System.err)
+        process.waitForOrKill(60000)
 
-
-    def jobDslScript = new File(ROOT, "Jenkinsfile.job")
-    if (jobDslScript.exists()) {
-        println("Found Jenkinsfile.job, creating jobs using jobs-dsl")
-        def workspace = new File('.')
-        def jobManagement = new JenkinsJobManagement(System.out, [:], workspace)
-        new DslScriptLoader(jobManagement).runScript(jobDslScript.text)
+        def jobDslScript = new File(ROOT, "Jenkinsfile.job")
+        if (jobDslScript.exists()) {
+            println("Found Jenkinsfile.job, creating jobs using jobs-dsl")
+            def workspace = new File('.')
+            def jobManagement = new JenkinsJobManagement(System.out, [:], workspace)
+            new DslScriptLoader(jobManagement).runScript(jobDslScript.text)
+        }
     }
 }
 
