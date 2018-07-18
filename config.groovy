@@ -58,11 +58,6 @@ location.setAdminAddress(EMAIL)
 location.setUrl(URL)
 location.save()
 
-// if (!jenkins.installState.isSetupComplete()) {
-    InstallState.INITIAL_SETUP_COMPLETED.initializeState()
-// }
-
-
 REPOS = System.getenv()['REPO']
 
 if (REPOS != null) {
@@ -97,7 +92,6 @@ def LDAP_USER = System.getenv()['LDAP_USER']
 def LDAP_PASS = System.getenv()['LDAP_PASS']
 def LDAP_ROOT = System.getenv()['LDAP_ROOT']
 
-
 if( LDAP_SERVER != "" && !(jenkins.securityRealm instanceof LDAPSecurityRealm)) {
     println("Configuring LDAP authentication")
     LDAPConfiguration conf = new LDAPConfiguration(LDAP_SERVER, LDAP_ROOT, true,LDAP_USER, Secret.fromString(LDAP_PASS));
@@ -130,26 +124,26 @@ if (AD_SERVER != "" && !(jenkins.securityRealm instanceof ActiveDirectorySecurit
     jenkins.save()
 }
 
-    RoleBasedAuthorizationStrategy roles = new RoleBasedAuthorizationStrategy()
-    jenkins.setAuthorizationStrategy(roles)
+RoleBasedAuthorizationStrategy roles = new RoleBasedAuthorizationStrategy()
+jenkins.setAuthorizationStrategy(roles)
 
-    Constructor[] constrs = Role.class.getConstructors();
-    for (Constructor<?> c : constrs) {
-      c.setAccessible(true);
-    }
+Constructor[] constrs = Role.class.getConstructors();
+for (Constructor<?> c : constrs) {
+  c.setAccessible(true);
+}
 
-    RoleBasedAuthorizationStrategy.class.getDeclaredMethod("assignRole", String.class, Role.class, String.class).setAccessible(true);
+RoleBasedAuthorizationStrategy.class.getDeclaredMethod("assignRole", String.class, Role.class, String.class).setAccessible(true);
 
-    Role adminRole = new Role('admin',new HashSet(Permission.all));
-    roles.addRole(RoleBasedAuthorizationStrategy.GLOBAL, adminRole);
-    roles.assignRole(RoleBasedAuthorizationStrategy.GLOBAL, adminRole, System.getenv()['ADMIN_GROUP']?:"Jenkins Admins");
+Role adminRole = new Role('admin',new HashSet(Permission.all));
+roles.addRole(RoleBasedAuthorizationStrategy.GLOBAL, adminRole);
+roles.assignRole(RoleBasedAuthorizationStrategy.GLOBAL, adminRole, System.getenv()['ADMIN_GROUP']?:"Jenkins Admins");
 
-    Set<Permission> readOnly = new HashSet<Permission>();
-    readOnly.add(Permission.fromId("hudson.model.Hudson.Read"));
-    readOnly.add(Permission.fromId("hudson.model.View.Read"));
+Set<Permission> readOnly = new HashSet<Permission>();
+readOnly.add(Permission.fromId("hudson.model.Hudson.Read"));
+readOnly.add(Permission.fromId("hudson.model.View.Read"));
 
-    Role authenticatedRole = new Role('read', readOnly);
-    roles.addRole(RoleBasedAuthorizationStrategy.GLOBAL, authenticatedRole);
-    roles.assignRole(RoleBasedAuthorizationStrategy.GLOBAL, authenticatedRole, System.getenv()['READ_GROUP']?:"authenticated");
+Role authenticatedRole = new Role('read', readOnly);
+roles.addRole(RoleBasedAuthorizationStrategy.GLOBAL, authenticatedRole);
+roles.assignRole(RoleBasedAuthorizationStrategy.GLOBAL, authenticatedRole, System.getenv()['READ_GROUP']?:"authenticated");
 
-    jenkins.save()
+jenkins.save()
