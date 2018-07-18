@@ -31,7 +31,7 @@ jenkins.setSecurityRealm(hudsonRealm)
 jenkins.setAuthorizationStrategy(new FullControlOnceLoggedInAuthorizationStrategy())
 jenkins.save()
 
-if (System.getenv()['DEPLOY_KEY'] != null) {
+if (DEPLOY_KEY != null) {
     credentials= jenkins.getExtensionList('com.cloudbees.plugins.credentials.SystemCredentialsProvider')[0].getStore()
     ssh = new BasicSSHUserPrivateKey(CredentialsScope.GLOBAL,"deploy","deploy",new FileOnMasterPrivateKeySource(DEPLOY_KEY),"","")
     credentials.addCredentials( Domain.global(), ssh)
@@ -68,7 +68,7 @@ REPO = System.getenv()['REPO']
 if (REPO != null) {
     ROOT = "/var/jenkins_home/REPO/"
     def process = new ProcessBuilder([ "bash", "-c",
-                                      "GIT_SSH_COMMAND='ssh -i /etc/jenkins/keys/ssh-private -oStrictHostKeyChecking=no' git clone $REPO $ROOT".toString()])
+                                      "GIT_SSH_COMMAND='ssh -i ${DEPLOY_KEY} -oStrictHostKeyChecking=no' git clone $REPO $ROOT".toString()])
                                       .redirectErrorStream(true)
                                       .start()
     process.consumeProcessOutput(System.out, System.err)
