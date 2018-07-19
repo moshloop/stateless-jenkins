@@ -17,7 +17,7 @@ RUN apt-get update && \
     pandevice f5-sdk dnspython \
     pywinrm[kerberos] pywinrm[credssp] \
     pyvmomi apache-libcloud vapi-client-bindings pyOpenSSL==16.2.0 \
-    && ansible-galaxy install geerlingguy.docker moshloop.java
+    && ansible-galaxy install geerlingguy.docker,2.4.3 moshloop.java
 
 RUN echo - {hosts: all, roles: [geerlingguy.docker]} > /tmp/play && ansible-playbook -i "localhost," -c local /tmp/play
 RUN echo - {hosts: all, roles: [moshloop.java]} > /tmp/play && ansible-playbook -i "localhost," -c local /tmp/play
