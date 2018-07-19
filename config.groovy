@@ -10,6 +10,8 @@ import com.cloudbees.plugins.credentials.domains.*
 import com.cloudbees.plugins.credentials.impl.*;
 import javaposse.jobdsl.dsl.DslScriptLoader
 import javaposse.jobdsl.plugin.JenkinsJobManagement
+import javaposse.jobdsl.plugin.GlobalJobDslSecurityConfiguration
+import jenkins.model.GlobalConfiguration
 import com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey.FileOnMasterPrivateKeySource;
 import com.cloudbees.jenkins.plugins.sshcredentials.impl.*;
 import hudson.util.*
@@ -147,3 +149,8 @@ roles.addRole(RoleBasedAuthorizationStrategy.GLOBAL, authenticatedRole);
 roles.assignRole(RoleBasedAuthorizationStrategy.GLOBAL, authenticatedRole, System.getenv()['READ_GROUP']?:"authenticated");
 
 jenkins.save()
+
+if (System.getenv()['DISABLE_DSL_SECURITY']?:"false" == "true") {
+    GlobalConfiguration.all().get(GlobalJobDslSecurityConfiguration.class).useScriptSecurity=false
+    GlobalConfiguration.all().get(GlobalJobDslSecurityConfiguration.class).save()
+}
