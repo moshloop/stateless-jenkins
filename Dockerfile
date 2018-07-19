@@ -4,15 +4,20 @@ ENV JAVA_OPTS=-Djenkins.install.runSetupWizard=false
 ENV JENKINS_VER=$JENKINS_VER
 ENV JENKINS_HOME=/var/jenkins_home
 ENV ANSIBLE_CONFIG /etc/ansible/ansible.cfg
-ARG ANSIBLE_VERSION=2.4.4.0
+ARG ANSIBLE_VERSION=2.6.1
 ENV ANSIBLE_VERSION=$ANSIBLE_VERSION
 ENV DEBIAN_FRONTEND=noninteractive
 ADD ansible.cfg /etc/ansible/ansible.cfg
 USER root
 RUN apt-get update && \
-    apt-get install -y python-setuptools python-pip python-dev build-essential jq libkrb5-dev krb5-user wget curl openssh-client sshpass git  && \
-    pip install ansible==$ANSIBLE_VERSION awscli aws-sudo s3cmd boto pandevice f5-sdk pywinrm[kerberos] pywinrm[credssp] certifi urllib3==1.22 jmespath pyvmomi && \
-    ansible-galaxy install geerlingguy.docker moshloop.java
+    apt-get install -y python-setuptools python-pip python-dev build-essential jq libkrb5-dev krb5-user wget openssh-client sshpass genisoimage bats git && \
+    pip install \
+    ansible==$ANSIBLE_VERSION ansible-run urllib3==1.22 jmespath certifi  \
+    awscli aws-sudo s3cmd boto \
+    pandevice f5-sdk dnspython \
+    pywinrm[kerberos] pywinrm[credssp] \
+    pyvmomi apache-libcloud vapi-client-bindings pyOpenSSL==16.2.0 \
+    && ansible-galaxy install geerlingguy.docker moshloop.java
 
 RUN echo - {hosts: all, roles: [geerlingguy.docker]} > /tmp/play && ansible-playbook -i "localhost," -c local /tmp/play
 RUN echo - {hosts: all, roles: [moshloop.java]} > /tmp/play && ansible-playbook -i "localhost," -c local /tmp/play
