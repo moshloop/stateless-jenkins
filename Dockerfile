@@ -14,7 +14,7 @@ RUN apt-get update && \
     apt-get install -y python-setuptools python-pip python-dev build-essential jq libkrb5-dev krb5-user wget openssh-client sshpass genisoimage bats git \
     libseccomp2 libdevmapper1.02.1 libltdl7 iptables && \
     pip install \
-    ansible==$ANSIBLE_VERSION ansible-run urllib3==1.22 jmespath certifi  \
+    ansible==$ANSIBLE_VERSION ansible-run urllib3==1.22 jmespath certifi netaddr  \
     awscli aws-sudo s3cmd boto \
     pandevice f5-sdk dnspython \
     pywinrm[kerberos] pywinrm[credssp] \
