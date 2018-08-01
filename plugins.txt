@@ -128,6 +128,7 @@ seed:2.1.4
 slack:2.3
 skip-certificate-check:1.0
 sse-gateway:1.15
+ssh-agent:1.17
 ssh-credentials:1.14
 ssh:2.6.1
 structs:1.14
