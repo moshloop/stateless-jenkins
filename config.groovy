@@ -16,6 +16,11 @@ import com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey.
 import com.cloudbees.jenkins.plugins.sshcredentials.impl.*;
 import hudson.util.*
 import com.michelin.cio.hudson.plugins.rolestrategy.*
+import jenkins.plugins.git.GitSCMSource
+import jenkins.plugins.git.traits.BranchDiscoveryTrait
+import org.jenkinsci.plugins.workflow.libs.GlobalLibraries
+import org.jenkinsci.plugins.workflow.libs.LibraryConfiguration
+import org.jenkinsci.plugins.workflow.libs.SCMSourceRetriever
 
 
 def DEPLOY_KEY = System.getenv()['DEPLOY_KEY']?:"/etc/jenkins/keys/ssh-private"
@@ -130,7 +135,6 @@ if (AD_SERVER != "" && !(jenkins.securityRealm instanceof ActiveDirectorySecurit
     jenkins.save()
 }
 
-
 if (AD_SERVER != "" || LDAP_SERVER != "" ) {
     RoleBasedAuthorizationStrategy roles = new RoleBasedAuthorizationStrategy()
     jenkins.setAuthorizationStrategy(roles)
@@ -156,7 +160,27 @@ if (AD_SERVER != "" || LDAP_SERVER != "" ) {
 
     jenkins.save()
 }
+
 if (System.getenv()['DISABLE_DSL_SECURITY']?:"false" == "true") {
     GlobalConfiguration.all().get(GlobalJobDslSecurityConfiguration.class).useScriptSecurity=false
     GlobalConfiguration.all().get(GlobalJobDslSecurityConfiguration.class).save()
+}
+
+GLOBAL_LIBRARY = System.getenv()['GLOBAL_SHARED_LIBRARY']
+if (GLOBAL_LIBRARY != null) {
+    println "Loading global library from: ${GLOBAL_LIBRARY}"
+
+    def scm = new GitSCMSource(GLOBAL_LIBRARY)
+    scm.credentialsId = 'deploy'
+    scm.traits = [new BranchDiscoveryTrait()]
+
+    def library = new LibraryConfiguration("Global Library", new SCMSourceRetriever(scm))
+    library.defaultVersion = System.getenv()['GLOBAL_SHARED_LIBRARY_VERSION']?:"master"
+    library.implicit = true
+    library.allowVersionOverride = true
+    library.includeInChangesets = true
+
+    def global_settings = Jenkins.instance.getExtensionList(GlobalLibraries.class)[0]
+    global_settings.libraries = [library]
+    global_settings.save()
 }
