@@ -22,7 +22,11 @@ def DEPLOY_KEY = System.getenv()['DEPLOY_KEY']?:"/etc/jenkins/keys/ssh-private"
 def EMAIL = System.getenv()['EMAIL']?:"noreply@jenkins.local"
 def URL = System.getenv()['URL']?:"http://localhost:8080"
 def ADMIN_USER = System.getenv()['ADMIN_USER']?:"admin"
-def ADMIN_PASS = System.getenv()['ADMIN_PASS']?:"admin"
+def ADMIN_PASS = System.getenv()['ADMIN_PASS']
+
+if (ADMIN_PASS == null) {
+     ADMIN_PASS = new File("/var/jenkins_home/secrets/initialAdminPassword").text
+}
 
 jenkins = Jenkins.instance
 
@@ -126,30 +130,32 @@ if (AD_SERVER != "" && !(jenkins.securityRealm instanceof ActiveDirectorySecurit
     jenkins.save()
 }
 
-RoleBasedAuthorizationStrategy roles = new RoleBasedAuthorizationStrategy()
-jenkins.setAuthorizationStrategy(roles)
 
-Constructor[] constrs = Role.class.getConstructors();
-for (Constructor<?> c : constrs) {
-  c.setAccessible(true);
+if (AD_SERVER != "" || LDAP_SERVER != "" ) {
+    RoleBasedAuthorizationStrategy roles = new RoleBasedAuthorizationStrategy()
+    jenkins.setAuthorizationStrategy(roles)
+
+    Constructor[] constrs = Role.class.getConstructors();
+    for (Constructor<?> c : constrs) {
+      c.setAccessible(true);
+    }
+
+    RoleBasedAuthorizationStrategy.class.getDeclaredMethod("assignRole", String.class, Role.class, String.class).setAccessible(true);
+
+    Role adminRole = new Role('admin',new HashSet(Permission.all));
+    roles.addRole(RoleBasedAuthorizationStrategy.GLOBAL, adminRole);
+    roles.assignRole(RoleBasedAuthorizationStrategy.GLOBAL, adminRole, System.getenv()['ADMIN_GROUP']?:"Jenkins Admins");
+
+    Set<Permission> readOnly = new HashSet<Permission>();
+    readOnly.add(Permission.fromId("hudson.model.Hudson.Read"));
+    readOnly.add(Permission.fromId("hudson.model.View.Read"));
+
+    Role authenticatedRole = new Role('read', readOnly);
+    roles.addRole(RoleBasedAuthorizationStrategy.GLOBAL, authenticatedRole);
+    roles.assignRole(RoleBasedAuthorizationStrategy.GLOBAL, authenticatedRole, System.getenv()['READ_GROUP']?:"authenticated");
+
+    jenkins.save()
 }
-
-RoleBasedAuthorizationStrategy.class.getDeclaredMethod("assignRole", String.class, Role.class, String.class).setAccessible(true);
-
-Role adminRole = new Role('admin',new HashSet(Permission.all));
-roles.addRole(RoleBasedAuthorizationStrategy.GLOBAL, adminRole);
-roles.assignRole(RoleBasedAuthorizationStrategy.GLOBAL, adminRole, System.getenv()['ADMIN_GROUP']?:"Jenkins Admins");
-
-Set<Permission> readOnly = new HashSet<Permission>();
-readOnly.add(Permission.fromId("hudson.model.Hudson.Read"));
-readOnly.add(Permission.fromId("hudson.model.View.Read"));
-
-Role authenticatedRole = new Role('read', readOnly);
-roles.addRole(RoleBasedAuthorizationStrategy.GLOBAL, authenticatedRole);
-roles.assignRole(RoleBasedAuthorizationStrategy.GLOBAL, authenticatedRole, System.getenv()['READ_GROUP']?:"authenticated");
-
-jenkins.save()
-
 if (System.getenv()['DISABLE_DSL_SECURITY']?:"false" == "true") {
     GlobalConfiguration.all().get(GlobalJobDslSecurityConfiguration.class).useScriptSecurity=false
     GlobalConfiguration.all().get(GlobalJobDslSecurityConfiguration.class).save()
