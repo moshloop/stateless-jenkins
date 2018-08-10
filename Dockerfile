@@ -23,11 +23,12 @@ RUN apt-get update && \
 RUN ansible-role moshloop.java
 RUN wget -qO- -O tmp.zip https://releases.hashicorp.com/packer/1.2.4/packer_1.2.4_linux_amd64.zip && \
     unzip tmp.zip && mv packer /usr/bin/ && chmod +x /usr/bin/packer && rm tmp.zip
-RUN wget -O systools.deb https://github.com/moshloop/systools/releases/download/2.2/systools_2.2_amd64.deb && dpkg -i systools.deb
+RUN wget -O systools.deb https://github.com/moshloop/systools/releases/download/2.3/systools_2.3_amd64.deb && dpkg -i systools.deb
 RUN install_bin https://github.com/moshloop/db-cli/releases/download/1.2/db-cli  \
      https://github.com/moshloop/fireviz/releases/download/1.3/fireviz \
      https://github.com/moshloop/waiter/releases/download/1.1/waiter \
-     https://github.com/moshloop/smarti/releases/download/0.1/smarti
+     https://github.com/moshloop/smarti/releases/download/0.1/smarti \
+     https://github.com/vmware/govmomi/releases/download/v0.18.0/govc_linux_386.gz
 RUN chown jenkins:jenkins $JENKINS_HOME
 USER jenkins
 RUN mkdir -p $JENKINS_HOME/init.groovy.d
