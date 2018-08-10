@@ -7,6 +7,6 @@ endif
 
 .PHONY: package
 package: *
-	docker built -t moshloop/stateless-jenkins:$(tag) ./
+	docker build -t moshloop/stateless-jenkins:$(tag) ./
 	docker login -u $USER -p $PASS
 	docker push moshloop/stateless-jenkins:$(tag)
