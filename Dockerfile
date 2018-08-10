@@ -18,16 +18,16 @@ RUN apt-get update && \
     awscli aws-sudo s3cmd boto \
     pandevice f5-sdk dnspython \
     pywinrm[kerberos] pywinrm[credssp] \
-    pyvmomi apache-libcloud vapi-client-bindings pyOpenSSL==16.2.0 \
-    && ansible-galaxy install moshloop.java
+    pyvmomi apache-libcloud vapi-client-bindings pyOpenSSL==16.2.0
 
-RUN wget -nv -O /tmp/docker.deb https://download.docker.com/linux/debian/dists/stretch/pool/stable/amd64/docker-ce_$DOCKER_VER~ce~3-0~debian_amd64.deb && \
-    dpkg -i /tmp/docker.deb && \
-    update-rc.d docker defaults
-
-RUN echo - {hosts: all, roles: [moshloop.java]} > /tmp/play && ansible-playbook -i "localhost," -c local /tmp/play
+RUN ansible-role moshloop.java
 RUN wget -qO- -O tmp.zip https://releases.hashicorp.com/packer/1.2.4/packer_1.2.4_linux_amd64.zip && \
     unzip tmp.zip && mv packer /usr/bin/ && chmod +x /usr/bin/packer && rm tmp.zip
+RUN wget -O systools.deb https://github.com/moshloop/systools/releases/download/2.1.2/systools_2.1_amd64.deb && dpkg -i systools.deb
+RUN install_bin https://github.com/moshloop/db-cli/releases/download/1.2/db-cli  \
+     https://github.com/moshloop/fireviz/releases/download/1.3/fireviz \
+     https://github.com/moshloop/waiter/releases/download/1.1/waiter \
+     https://github.com/moshloop/smarti/releases/download/0.1/smarti
 RUN chown jenkins:jenkins $JENKINS_HOME
 USER jenkins
 RUN mkdir -p $JENKINS_HOME/init.groovy.d
