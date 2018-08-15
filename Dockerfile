@@ -18,6 +18,7 @@ RUN apt-get update && \
     awscli aws-sudo s3cmd boto \
     pandevice f5-sdk dnspython \
     pywinrm[kerberos] pywinrm[credssp] \
+    requests requests_ntlm cryptography \
     pyvmomi apache-libcloud vapi-client-bindings pyOpenSSL==16.2.0
 
 RUN ansible-role moshloop.java
