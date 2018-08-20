@@ -22,14 +22,20 @@ RUN apt-get update && \
     pyvmomi apache-libcloud vapi-client-bindings pyOpenSSL==16.2.0
 
 RUN ansible-role moshloop.java
-RUN wget -qO- -O tmp.zip https://releases.hashicorp.com/packer/1.2.4/packer_1.2.4_linux_amd64.zip && \
-    unzip tmp.zip && mv packer /usr/bin/ && chmod +x /usr/bin/packer && rm tmp.zip
-RUN wget -O systools.deb https://github.com/moshloop/systools/releases/download/2.3/systools_2.3_amd64.deb && dpkg -i systools.deb
+RUN wget -O systools.deb https://github.com/moshloop/systools/releases/download/2.6/systools_2.6_amd64.deb && dpkg -i systools.deb
 RUN install_bin https://github.com/moshloop/db-cli/releases/download/1.2/db-cli  \
      https://github.com/moshloop/fireviz/releases/download/1.3/fireviz \
      https://github.com/moshloop/waiter/releases/download/1.1/waiter \
      https://github.com/moshloop/smarti/releases/download/0.1/smarti \
-     https://github.com/vmware/govmomi/releases/download/v0.18.0/govc_linux_386.gz
+     https://github.com/vmware/govmomi/releases/download/v0.18.0/govc_linux_386.gz \
+     https://releases.hashicorp.com/packer/1.2.4/packer_1.2.4_linux_amd64.zip  && \
+     install_deb \
+         https://github.com/cyberark/summon/releases/download/v0.6.7/summon.deb \
+         https://github.com/cyberark/summon-conjur/releases/download/v0.5.2/summon-conjur.deb && \
+     BIN=/usr/local/lib/summon install_bin \
+        https://github.com/cyberark/summon-aws-secrets/releases/download/v0.1.0/summon-aws-secrets-linux-amd64.tar.gz \
+        https://github.com/conjurinc/summon-s3/releases/download/v0.2.0/summon-s3-linux-amd64.tar.gz \
+        https://github.com/cyberark/summon-file/releases/download/v0.1.0/summon-file-linux-amd64.tar.gz
 RUN chown jenkins:jenkins $JENKINS_HOME
 USER jenkins
 RUN mkdir -p $JENKINS_HOME/init.groovy.d
