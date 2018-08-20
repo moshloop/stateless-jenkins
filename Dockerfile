@@ -22,7 +22,7 @@ RUN apt-get update && \
     pyvmomi apache-libcloud vapi-client-bindings pyOpenSSL==16.2.0
 
 RUN ansible-role moshloop.java
-RUN wget -O systools.deb https://github.com/moshloop/systools/releases/download/2.6/systools_2.6_amd64.deb && dpkg -i systools.deb
+RUN wget -O systools.deb https://github.com/moshloop/systools/releases/download/2.8/systools_2.8_amd64.deb && dpkg -i systools.deb
 RUN install_bin https://github.com/moshloop/db-cli/releases/download/1.2/db-cli  \
      https://github.com/moshloop/fireviz/releases/download/1.3/fireviz \
      https://github.com/moshloop/waiter/releases/download/1.1/waiter \
