@@ -16,7 +16,7 @@ RUN apt-get update && \
     pip install \
     ansible==$ANSIBLE_VERSION ansible-run urllib3==1.22 jmespath certifi netaddr  \
     awscli aws-sudo s3cmd boto \
-    pandevice f5-sdk dnspython \
+    pandevice f5-sdk dnspython cidrtrie\
     pywinrm[kerberos] pywinrm[credssp] \
     requests requests_ntlm cryptography \
     pyvmomi apache-libcloud vapi-client-bindings pyOpenSSL==16.2.0
