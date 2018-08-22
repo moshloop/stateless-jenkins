@@ -12,15 +12,7 @@ ADD ansible.cfg /etc/ansible/ansible.cfg
 USER root
 RUN apt-get update && \
     apt-get install -y python-setuptools python-pip python-dev build-essential jq libkrb5-dev krb5-user wget openssh-client sshpass genisoimage bats git dnsutils nano \
-    libseccomp2 libdevmapper1.02.1 libltdl7 iptables && \
-    pip install \
-    ansible==$ANSIBLE_VERSION ansible-run urllib3==1.22 jmespath certifi netaddr  \
-    awscli aws-sudo s3cmd boto \
-    pandevice f5-sdk dnspython cidrtrie textfsm pandas openpyxl \
-    pywinrm[kerberos] pywinrm[credssp] \
-    requests requests_ntlm cryptography \
-    pyvmomi apache-libcloud vapi-client-bindings pyOpenSSL==16.2.0
-
+    libseccomp2 libdevmapper1.02.1 libltdl7 iptables
 RUN ansible-role moshloop.java
 RUN wget -O systools.deb https://github.com/moshloop/systools/releases/download/2.9/systools_2.9_amd64.deb && dpkg -i systools.deb
 RUN install_bin https://github.com/moshloop/db-cli/releases/download/1.2/db-cli  \
@@ -36,6 +28,13 @@ RUN install_bin https://github.com/moshloop/db-cli/releases/download/1.2/db-cli 
         https://github.com/cyberark/summon-aws-secrets/releases/download/v0.1.0/summon-aws-secrets-linux-amd64.tar.gz \
         https://github.com/conjurinc/summon-s3/releases/download/v0.2.0/summon-s3-linux-amd64.tar.gz \
         https://github.com/cyberark/summon-file/releases/download/v0.1.0/summon-file-linux-amd64.tar.gz
+RUN pip install \
+    ansible==$ANSIBLE_VERSION ansible-run urllib3==1.22 jmespath certifi netaddr  \
+    awscli aws-sudo s3cmd boto \
+    pandevice f5-sdk dnspython cidrtrie textfsm pandas openpyxl \
+    pywinrm[kerberos] pywinrm[credssp] \
+    requests requests_ntlm cryptography \
+    pyvmomi apache-libcloud vapi-client-bindings pyOpenSSL==16.2.0
 RUN chown jenkins:jenkins $JENKINS_HOME
 USER jenkins
 RUN mkdir -p $JENKINS_HOME/init.groovy.d
