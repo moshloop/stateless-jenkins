@@ -135,6 +135,7 @@ sse-gateway:1.15
 ssh-agent:1.16
 ssh-credentials:1.14
 ssh:2.6.1
+stash-pullrequest-builder:1.7.0
 structs:1.14
 subversion:2.11.0
 timestamper:1.8.10
