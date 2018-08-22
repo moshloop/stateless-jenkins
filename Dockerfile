@@ -34,7 +34,7 @@ RUN pip install \
     pywinrm[kerberos] pywinrm[credssp] \
     requests requests_ntlm cryptography \
     pyvmomi apache-libcloud vapi-client-bindings pyOpenSSL==16.2.0
-RUN chown -r jenkins:jenkins $JENKINS_HOME
+RUN chown jenkins:jenkins $JENKINS_HOME
 USER jenkins
 RUN mkdir -p $JENKINS_HOME/init.groovy.d
 COPY config.groovy $JENKINS_HOME/init.groovy.d/
