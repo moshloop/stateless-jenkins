@@ -42,4 +42,4 @@ COPY plugins.txt $JENKINS_HOME/
 ADD https://github.com/moshloop/stash-pullrequest-builder-plugin/releases/download/1.7.1/stash-pullrequest-builder.hpi $JENKINS_HOME/plugins/
 USER root
 RUN plugins.sh $JENKINS_HOME/plugins.txt
-RUN chown -r jenkins:jenkins $JENKINS_HOME
+RUN chown -R jenkins:jenkins $JENKINS_HOME
