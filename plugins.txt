@@ -67,6 +67,7 @@ envinject-api:1.5
 envinject:2.1.5
 external-monitor-job:1.7
 favorite:2.3.2
+filesystem_scm:2.1
 git-client:2.7.2
 git-parameter:0.9.3
 git-server:1.7
