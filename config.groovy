@@ -43,18 +43,18 @@ jenkins.setAuthorizationStrategy(new FullControlOnceLoggedInAuthorizationStrateg
 jenkins.save()
 
 if (DEPLOY_KEY != null) {
-    credentials= jenkins.getExtensionList('com.cloudbees.plugins.credentials.SystemCredentialsProvider')[0].getStore()
+    credentials = jenkins.getExtensionList('com.cloudbees.plugins.credentials.SystemCredentialsProvider')[0].getStore()
     ssh = new BasicSSHUserPrivateKey(CredentialsScope.GLOBAL,"deploy","deploy",new FileOnMasterPrivateKeySource(DEPLOY_KEY),"","")
     credentials.addCredentials( Domain.global(), ssh)
 }
 
-if (System.getenv()['BITBUCKET_KEY'] != null) {
-    println "Adding bitbucket credential"
-    def bitbucket = new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL,"bitbucket", "bitbucket", System.getenv()['BITBUCKET_KEY'], System.getenv()['BITBUCKET_SECRET'])
+if (System.getenv()['API_USER'] != null) {
+    println "Adding api credentials"
+    def bitbucket = new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL,"api", "api", System.getenv()['API_USER'], System.getenv()['API_PASS'])
     credentials.addCredentials( Domain.global(), bitbucket)
 
     def bitbucketBuildStatusNotifier = jenkins.getDescriptorByType(org.jenkinsci.plugins.bitbucket.BitbucketBuildStatusNotifier.DescriptorImpl)
-    bitbucketBuildStatusNotifier.setGlobalCredentialsId('bitbucket')
+    bitbucketBuildStatusNotifier.setGlobalCredentialsId('api')
     bitbucketBuildStatusNotifier.save()
 }
 

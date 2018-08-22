@@ -29,8 +29,8 @@ Jenkins installed to: `/usr/share/jenkins`
 | URL              | Yes      | Public URL that the jenkins is accessible at    |
 | EMAIL            | Yes      | Git / Notifications email                |
 | JENKINS_PASSWORD | No       | `admin` user password, defaults to `admin` |
-| BITBUCKET_KEY    | No       | [OAuth](https://confluence.atlassian.com/bitbucket/oauth-on-bitbucket-cloud-238027431.html#OAuthonBitbucketCloud-Createaconsumer) Key for Bitbucket build notifications. can be referenced in jobs using `bitbucket` credential id.  |
-| BITBUCKET_SECRET | No       | OAuth Secret                             |
+| API_USER    | No       | Can be referenced in jobs using `api` credential id.  |
+| API_PASS | No       |                              |
 | JAVA_OPTS        | No       | JVM Arguments                            |
 | JENKINS_OPTS     | No       | JVM Arguments                            |
 | JENKINS_SLAVE_AGENT_PORT        | No       | Defaults to `50001`       |
