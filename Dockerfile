@@ -34,10 +34,12 @@ RUN pip install \
     pywinrm[kerberos] pywinrm[credssp] \
     requests requests_ntlm cryptography \
     pyvmomi apache-libcloud vapi-client-bindings pyOpenSSL==16.2.0
-RUN chown jenkins:jenkins $JENKINS_HOME
+RUN chown -r jenkins:jenkins $JENKINS_HOME
 USER jenkins
 RUN mkdir -p $JENKINS_HOME/init.groovy.d
 COPY config.groovy $JENKINS_HOME/init.groovy.d/
 COPY plugins.txt $JENKINS_HOME/
 ADD https://github.com/moshloop/stash-pullrequest-builder-plugin/releases/download/1.7.1/stash-pullrequest-builder.hpi $JENKINS_HOME/plugins/
+USER root
 RUN plugins.sh $JENKINS_HOME/plugins.txt
+RUN chown -r jenkins:jenkins $JENKINS_HOME
