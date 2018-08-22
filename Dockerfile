@@ -11,7 +11,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 ADD ansible.cfg /etc/ansible/ansible.cfg
 USER root
 RUN apt-get update && \
-    apt-get install -y python-setuptools python-pip python-dev build-essential jq libkrb5-dev krb5-user wget openssh-client sshpass genisoimage bats git dnsutils nano \
+    apt-get install -y python-setuptools python-pip python-dev build-essential jq libkrb5-dev krb5-user wget openssh-client sshpass genisoimage bats git dnsutils nano sudo \
     libseccomp2 libdevmapper1.02.1 libltdl7 iptables
 RUN wget -O systools.deb https://github.com/moshloop/systools/releases/download/2.9/systools_2.9_amd64.deb && dpkg -i systools.deb
 RUN install_bin https://github.com/moshloop/db-cli/releases/download/1.2/db-cli  \
@@ -39,7 +39,6 @@ USER jenkins
 RUN mkdir -p $JENKINS_HOME/init.groovy.d
 COPY config.groovy $JENKINS_HOME/init.groovy.d/
 COPY plugins.txt $JENKINS_HOME/
-ADD https://github.com/moshloop/stash-pullrequest-builder-plugin/releases/download/1.7.1/stash-pullrequest-builder.hpi $JENKINS_HOME/plugins/
 USER root
 RUN plugins.sh $JENKINS_HOME/plugins.txt
 RUN chown -R jenkins:jenkins $JENKINS_HOME
