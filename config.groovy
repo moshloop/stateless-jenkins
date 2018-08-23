@@ -21,6 +21,9 @@ import jenkins.plugins.git.traits.BranchDiscoveryTrait
 import org.jenkinsci.plugins.workflow.libs.GlobalLibraries
 import org.jenkinsci.plugins.workflow.libs.LibraryConfiguration
 import org.jenkinsci.plugins.workflow.libs.SCMSourceRetriever
+import hudson.security.csrf.DefaultCrumbIssuer
+
+
 
 
 def DEPLOY_KEY = System.getenv()['DEPLOY_KEY']?:"/etc/jenkins/keys/ssh-private"
@@ -40,6 +43,12 @@ hudsonRealm.createAccount(ADMIN_USER, ADMIN_PASS)
 jenkins.setSecurityRealm(hudsonRealm)
 
 jenkins.setAuthorizationStrategy(new FullControlOnceLoggedInAuthorizationStrategy())
+
+if (System.getenv()['DISABLE_CSRF'] == "true") {
+    jenkins.setCrumbIssuer(new DefaultCrumbIssuer(true))
+}
+
+jenkins.setInstallState(InstallState.RUNNING)
 jenkins.save()
 
 if (DEPLOY_KEY != null) {
