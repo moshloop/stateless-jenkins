@@ -41,4 +41,5 @@ COPY config.groovy $JENKINS_HOME/init.groovy.d/
 COPY plugins.txt $JENKINS_HOME/
 USER root
 RUN plugins.sh $JENKINS_HOME/plugins.txt
+ADD https://github.com/moshloop/stash-pullrequest-builder-plugin/releases/download/1.7.1/stash-pullrequest-builder.hpi $JENKINS_HOME/plugins/
 RUN chown -R jenkins:jenkins $JENKINS_HOME
