@@ -19,7 +19,8 @@ RUN install_bin https://github.com/moshloop/db-cli/releases/download/1.2/db-cli 
      https://github.com/moshloop/waiter/releases/download/1.1/waiter \
      https://github.com/moshloop/smarti/releases/download/0.1/smarti \
      https://github.com/vmware/govmomi/releases/download/v0.18.0/govc_linux_386.gz \
-     https://releases.hashicorp.com/packer/1.2.4/packer_1.2.4_linux_amd64.zip  && \
+     https://releases.hashicorp.com/packer/1.2.4/packer_1.2.4_linux_amd64.zip \
+     https://master.dockerproject.org/linux/x86_64/docker && \
      install_deb \
          https://github.com/cyberark/summon/releases/download/v0.6.7/summon.deb \
          https://github.com/cyberark/summon-conjur/releases/download/v0.5.2/summon-conjur.deb && \
@@ -27,13 +28,7 @@ RUN install_bin https://github.com/moshloop/db-cli/releases/download/1.2/db-cli 
         https://github.com/cyberark/summon-aws-secrets/releases/download/v0.1.0/summon-aws-secrets-linux-amd64.tar.gz \
         https://github.com/conjurinc/summon-s3/releases/download/v0.2.0/summon-s3-linux-amd64.tar.gz \
         https://github.com/cyberark/summon-file/releases/download/v0.1.0/summon-file-linux-amd64.tar.gz
-RUN pip install \
-    ansible==$ANSIBLE_VERSION ansible-run urllib3==1.22 jmespath certifi netaddr  \
-    awscli aws-sudo s3cmd boto \
-    pandevice f5-sdk dnspython cidrtrie textfsm pandas openpyxl \
-    pywinrm[kerberos] pywinrm[credssp] \
-    requests requests_ntlm cryptography \
-    pyvmomi apache-libcloud vapi-client-bindings pyOpenSSL==16.2.0
+RUN pip install ansible==$ANSIBLE_VERSION ansible-run ansible-dependencies
 RUN chown jenkins:jenkins $JENKINS_HOME
 USER jenkins
 RUN mkdir -p $JENKINS_HOME/init.groovy.d
@@ -41,5 +36,4 @@ COPY config.groovy $JENKINS_HOME/init.groovy.d/
 COPY plugins.txt $JENKINS_HOME/
 USER root
 RUN plugins.sh $JENKINS_HOME/plugins.txt
-ADD https://github.com/moshloop/stash-pullrequest-builder-plugin/releases/download/1.7.1/stash-pullrequest-builder.hpi $JENKINS_HOME/plugins/
 RUN chown -R jenkins:jenkins $JENKINS_HOME
