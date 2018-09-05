@@ -22,7 +22,9 @@ RUN install_bin https://github.com/moshloop/db-cli/releases/download/1.2/db-cli 
      https://github.com/vmware/govmomi/releases/download/v0.18.0/govc_linux_386.gz \
      https://github.com/ivanilves/lstags/releases/download/v1.1.0/lstags-linux-v1.1.0.tar.gz \
      https://releases.hashicorp.com/packer/1.2.4/packer_1.2.4_linux_amd64.zip \
+     https://github.com/genuinetools/reg/releases/download/v0.15.3/reg-linux-amd64 \
      https://master.dockerproject.org/linux/x86_64/docker && \
+     mv /usr/bin/reg-linux-amd64 /usr/bin/reg && \
      install_deb \
          https://github.com/cyberark/summon/releases/download/v0.6.7/summon.deb \
          https://github.com/cyberark/summon-conjur/releases/download/v0.5.2/summon-conjur.deb && \
