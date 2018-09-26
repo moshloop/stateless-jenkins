@@ -2,6 +2,7 @@ ace-editor:1.1
 amazon-ecr:1.6
 active-directory:2.8
 ansible:1.0
+ansible-tower:0.9.0
 ansicolor:0.5.2
 ant:1.8
 antisamy-markup-formatter:1.5
@@ -46,12 +47,14 @@ build-name-setter:1.6.9
 build-pipeline-plugin:1.5.8
 build-timeout:1.19
 build-timestamp:1.0.2
+build-token-root:1.4
+build-token-trigger:1.0.0
 cloudbees-bitbucket-branch-source:2.2.11
 cloudbees-folder:6.5.1
 codecommit-url-helper:0.0.1
 command-launcher:1.2
 conditional-buildstep:1.3.6
-configuration-as-code:1.0-rc1
+configuration-as-code:1.0
 config-file-provider:2.18
 credentials-binding:1.16
 credentials:2.1.17
@@ -66,6 +69,7 @@ embeddable-build-status:1.9
 envinject-api:1.5
 envinject:2.1.5
 external-monitor-job:1.7
+extensible-choice-parameter:1.6.0
 favorite:2.3.2
 filesystem_scm:2.1
 git-client:2.7.2
@@ -87,6 +91,7 @@ jdk-tool:1.1
 jenkins-design-language:1.6.2
 jira:3.0.0
 job-dsl:1.69
+job-poll-action-plugin:1.0
 jquery-detached:1.2.1
 jquery:1.12.4-0
 jsch:0.1.54.2
@@ -130,6 +135,7 @@ scm-api:2.2.7
 scm-filter-branch-pr:0.3
 script-security:1.44
 seed:2.1.4
+selfie-trigger-plugin:1.0
 slack:2.3
 skip-certificate-check:1.0
 sse-gateway:1.15
