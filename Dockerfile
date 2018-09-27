@@ -1,4 +1,4 @@
-ARG JENKINS_VER=2.129
+ARG JENKINS_VER=2.143
 FROM jenkins/jenkins:$JENKINS_VER
 ENV JAVA_OPTS=-Djenkins.install.runSetupWizard=false
 ENV JENKINS_VER=$JENKINS_VER
