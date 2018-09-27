@@ -119,10 +119,10 @@ pipeline-github-lib:1.0
 pipeline-graph-analysis:1.7
 pipeline-input-step:2.8
 pipeline-milestone-step:1.3.1
-pipeline-model-api:1.3.1
+pipeline-model-api:1.3.2
 pipeline-model-declarative-agent:1.1.1
-pipeline-model-definition:1.3.1
-pipeline-model-extensions:1.3.1
+pipeline-model-definition:1.3.2
+pipeline-model-extensions:1.3.2
 pipeline-multibranch-defaults:1.1
 pipeline-rest-api:2.10
 pipeline-stage-step:2.3
