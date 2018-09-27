@@ -24,9 +24,6 @@ import org.jenkinsci.plugins.workflow.libs.SCMSourceRetriever
 
 System.setProperty("hudson.model.UpdateCenter.pluginDownloadReadTimeoutSeconds", "5")
 
-
-
-
 def DEPLOY_KEY = System.getenv()['DEPLOY_KEY']?:"/etc/jenkins/keys/ssh-private"
 def EMAIL = System.getenv()['EMAIL']?:"noreply@jenkins.local"
 def URL = System.getenv()['URL']?:"http://localhost:8080"
@@ -68,7 +65,6 @@ if (System.getenv()['API_USER'] != null) {
     bitbucketBuildStatusNotifier.save()
 }
 
-
 def GitSCM = jenkins.getDescriptor("hudson.plugins.git.GitSCM")
 GitSCM.setGlobalConfigName("Jenkins")
 GitSCM.setGlobalConfigEmail(EMAIL)
@@ -83,13 +79,17 @@ REPOS = System.getenv()['REPO']
 
 if (REPOS != null) {
     REPOS.split(",").each {REPO ->
-        ROOT = "/var/jenkins_home/$REPO/"
-        def process = new ProcessBuilder([ "bash", "-c",
-                                          "GIT_SSH_COMMAND='ssh -i ${DEPLOY_KEY} -oStrictHostKeyChecking=no' git clone $REPO $ROOT".toString()])
-                                          .redirectErrorStream(true)
-                                          .start()
-        process.consumeProcessOutput(System.out, System.err)
-        process.waitForOrKill(60000)
+        if (new File(REPO).exists()) {
+            ROOT = REPO
+        } else {
+            ROOT = "/var/jenkins_home/$REPO/"
+            def process = new ProcessBuilder([ "bash", "-c",
+                                              "GIT_SSH_COMMAND='ssh -i ${DEPLOY_KEY} -oStrictHostKeyChecking=no' git clone $REPO $ROOT".toString()])
+                                              .redirectErrorStream(true)
+                                              .start()
+            process.consumeProcessOutput(System.out, System.err)
+            process.waitForOrKill(60000)
+        }
 
         def jobDslScript = new File(ROOT, "Jenkinsfile.job")
         if (jobDslScript.exists()) {
