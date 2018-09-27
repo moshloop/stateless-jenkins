@@ -71,6 +71,7 @@ envinject-api:1.5
 envinject:2.1.6
 external-monitor-job:1.7
 extensible-choice-parameter:1.6.0
+extended-choice-parameter:0.76
 favorite:2.3.2
 filesystem_scm:2.1
 git-client:2.7.3
@@ -109,6 +110,7 @@ mercurial:2.4
 momentjs:1.1.1
 multiple-scms:0.6
 node-iterator-api:1.5.0
+uno-choice:2.1
 pam-auth:1.4
 parameterized-trigger:2.35.2
 pipeline-aws:1.32
