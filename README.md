@@ -2,38 +2,49 @@
 
 Stateless jenkins is a dockerized configuration of jenkins that is intended to be 100% stateless. i.e. volume persistence is not required.
 
-Jenkins will automatically create jobs by scanning the root repository for `Jenkinsfile` or `jobs.groovy` [dsl](https://github.com/jenkinsci/job-dsl-plugin) files.
+Jenkins will automatically create jobs by scanning the root repository for `Jenkinsfile` or `Jenkinsfile.job` [dsl](https://github.com/jenkinsci/job-dsl-plugin) files.
 
 e.g.
 
 * A  SSH key stored in `/etc/jenkins/keys/ssh-private` will be added to a SSH credential called `deploy`. The public portion of this key should be loaded on Github / Bitbucket as a deploy key allowing Jenkins read only access to the repository.
-* A `jobs.groovy` if found in the root of the repository will be executed
-* The entire repository will be scanned for `Jenkinsfile`'s - A new project will be created for each file found with the name of the containing folder and configured to poll for changes in that folder only. This allows different jobs to run for changes found in different directories.
+* A `Jenkinsfile.job` if found in the root of the repository will be executed
 
 
 ### Image Configuration
 
-Jenkins installed to: `/usr/share/jenkins`
-* ansible-2.4.4.0 with extended networking modules and WinRM support
+Jenkins installed to: `/usr/share/jenkins`:
+  * [Jenkinsfile-runner](https://github.com/jenkinsci/jenkinsfile-runner) installed to `/usr/local/bin/jenkinsfile-runner`
+  * Blue Ocean
+  * AWS, Azure, AD, LDAP, Bitbucket plugins
+
+**Additional Tools**
+* ansible-2.6.1 with python dependencies for most modules
+* [systools](https://github.com/moshloop/systools)
+* [fireviz](https://github.com/moshloop/fireviz)
+* [waiter](https://github.com/moshloop/waiter)
+* [govc](https://github.com/vmware/govmomi/tree/master/govc)
 * packer
-* docker (Docker in Docker)
+* docker, [lstags](https://github.com/ivanilves/lstags), [reg](https://github.com/genuinetools/reg)
+* [summon](https://github.com/cyberark/summon)
 * aws cli
-* +- 150 Jenkins plugins pre-installed
+
 
 #### Environment Variables
 
 | Environment Var  | Required | Description                              |
 | ---------------- | -------- | ---------------------------------------- |
-| REPO             | Yes      | Git checkout path of the job repository  |
-| DEPLOY_KEY       | No       | Path to SSH deploy private key, can be referenced in jobs using `deploy` credential id.  defaults to `/etc/jenkins/keys/ssh-private` |
+| REPO             | Yes      | Git repo ( e.g. `ssh://git@github.com/acme/jenkins-config` or `/work/repos/jenkins-config`) |
+| DEPLOY_KEY       | No       | Path to a SSH deploy private key, can be referenced in jobs using `deploy` credential id.  defaults to `/etc/jenkins/keys/ssh-private` |
+| GLOBAL_SHARED_LIBRARY | No | Git repo to use as global shared library |
 | URL              | Yes      | Public URL that the jenkins is accessible at    |
 | EMAIL            | Yes      | Git / Notifications email                |
-| JENKINS_PASSWORD | No       | `admin` user password, defaults to `admin` |
+| ADMIN_PASS | No       | `admin` user password, defaults to `admin` |
 | API_USER    | No       | Can be referenced in jobs using `api` credential id.  |
 | API_PASS | No       |                              |
 | JAVA_OPTS        | No       | JVM Arguments                            |
-| JENKINS_OPTS     | No       | JVM Arguments                            |
+| JENKINS_OPTS     | No       | Jenkins Arguments                      |
 | JENKINS_SLAVE_AGENT_PORT        | No       | Defaults to `50001`       |
+| DISABLE_CSRF | No | Defaults to false, |
 | LDAP_SERVER |  |  |
 | LDAP_USER |  |  |
 | LDAP_PASS |  |  |
@@ -79,7 +90,7 @@ spec:
       - env:
         - name: REPO
           value: git@github.com/org/jenkins-jobs.git
-        image: jenkinsci/jenkins:lts
+        image: moshloop/stateless-jenkins:3.32
         imagePullPolicy: Always
         name: jenkins
         ports:
@@ -95,15 +106,8 @@ spec:
 ```
 
 
-### To get the latest plugin versions
+### To update to the latest plugins
 
-```groovy
-def plugins = jenkins.model.Jenkins.instance.getPluginManager().getPlugins()
-plugins.each {
-  version = it.getVersion()
-  if (it.getUpdateInfo() != null) {
-    version = it.getUpdateInfo().version
-  }
-  println "${it.getShortName()}:${version}"
-}
+```bash
+python update-plugins.py plugins.txt
 ```
