@@ -1,3 +1,4 @@
+FROM jenkins/jenkinsfile-runner as JenkinsfileRunner
 ARG JENKINS_VER=2.143
 FROM jenkins/jenkins:$JENKINS_VER
 ENV JAVA_OPTS=-Djenkins.install.runSetupWizard=false
@@ -11,6 +12,8 @@ ENV ANSIBLE_VERSION=$ANSIBLE_VERSION
 ENV DEBIAN_FRONTEND=noninteractive
 ADD ansible.cfg /etc/ansible/ansible.cfg
 USER root
+COPY --from=JenkinsfileRunner /usr/local/bin/jenkinsfile-runner.hpi /usr/local/bin/jenkinsfile-runner.hpi
+COPY --from=JenkinsfileRunner /usr/local/bin/jenkinsfile-runner /usr/local/bin/jenkinsfile-runner
 RUN apt-get update && \
     apt-get install -y python-setuptools python-pip python-dev build-essential jq libkrb5-dev krb5-user wget openssh-client sshpass genisoimage bats git dnsutils nano sudo \
     libseccomp2 libdevmapper1.02.1 libltdl7 iptables
