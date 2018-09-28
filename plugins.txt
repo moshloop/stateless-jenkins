@@ -143,7 +143,7 @@ slack:2.3
 skip-certificate-check:1.0
 sse-gateway:1.16
 ssh-agent:1.16
-ssh-credentials:1.14
+ssh-credentials:1.13
 ssh:2.6.1
 stashNotifier:1.14
 structs:1.15
