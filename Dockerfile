@@ -1,6 +1,5 @@
 FROM jenkins/jenkinsfile-runner as JenkinsfileRunner
-ARG JENKINS_VER=2.143
-FROM jenkins/jenkins:$JENKINS_VER
+FROM jenkins/jenkins:2.143
 ENV JAVA_OPTS=-Djenkins.install.runSetupWizard=false
 ENV JENKINS_VER=$JENKINS_VER
 ENV JENKINS_HOME=/var/jenkins_home
