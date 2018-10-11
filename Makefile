@@ -2,7 +2,7 @@ tag := $(shell git tag --points-at HEAD )
 
 ifdef tag
 else
-  tag := $(shell git describe --abbrev=0 --tags)-debug
+  tag := latest
 endif
 
 .PHONY: package
@@ -11,3 +11,4 @@ package: *
 	docker build -t moshloop/stateless-jenkins:$(tag) ./
 	docker login -u $(USER) -p $(PASS)
 	docker push moshloop/stateless-jenkins:$(tag)
+	docker push moshloop/stateless-jenkins:latest

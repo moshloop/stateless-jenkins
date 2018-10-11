@@ -39,10 +39,14 @@ USER root
 COPY plugins.txt $JENKINS_HOME/
 RUN plugins.sh $JENKINS_HOME/plugins.txt
 RUN chown -R jenkins:jenkins $JENKINS_HOME
+RUN unzip /usr/share/jenkins/jenkins.war -d $JENKINS_HOME/war
 USER jenkins
 ENV JAVA_OPTS="-Dhudson.model.Hudson.killAfterLoad=true"
 # startup jenkins once to create the home directory structure and unpack the plugins
 RUN jenkins.sh
+RUN ls /var/jenkins_home
+VOLUME /var/jenkins_home
+RUN ls /var/jenkins_home
 ENV JAVA_OPTS="-Djenkins.install.runSetupWizard=false -Dhudson.model.UpdateCenter.never=true"
 COPY config.groovy $JENKINS_HOME/init.groovy.d/
-COPY build/libs/stateless-jenkins-0.0.1.jar $JENKINS_HOME/war/WEB-INF/lib/
+COPY build/libs/stateless-jenkins-0.0.1.jar  $JENKINS_HOME/war/WEB-INF/lib/
