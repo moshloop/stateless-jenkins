@@ -1,5 +1,4 @@
 import jenkins.model.*
-
 import hudson.security.*
 import hudson.model.*
 import jenkins.install.*
@@ -12,7 +11,7 @@ import javaposse.jobdsl.dsl.DslScriptLoader
 import javaposse.jobdsl.plugin.JenkinsJobManagement
 import javaposse.jobdsl.plugin.GlobalJobDslSecurityConfiguration
 import jenkins.model.GlobalConfiguration
-import com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey.FileOnMasterPrivateKeySource;
+import com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey.DirectEntryPrivateKeySource;
 import com.cloudbees.jenkins.plugins.sshcredentials.impl.*;
 import hudson.util.*
 import com.michelin.cio.hudson.plugins.rolestrategy.*
@@ -50,8 +49,9 @@ jenkins.setInstallState(InstallState.RUNNING)
 jenkins.save()
 
 if (DEPLOY_KEY != null) {
+    println "Adding deploy key: ${DEPLOY_KEY}"
     credentials = jenkins.getExtensionList('com.cloudbees.plugins.credentials.SystemCredentialsProvider')[0].getStore()
-    ssh = new BasicSSHUserPrivateKey(CredentialsScope.GLOBAL,"deploy","deploy",new FileOnMasterPrivateKeySource(DEPLOY_KEY),"","")
+    ssh = new BasicSSHUserPrivateKey(CredentialsScope.GLOBAL,"deploy","deploy",new DirectEntryPrivateKeySource(new File(DEPLOY_KEY).text),"","")
     credentials.addCredentials( Domain.global(), ssh)
 }
 
@@ -98,6 +98,9 @@ if (REPOS != null) {
             def jobManagement = new JenkinsJobManagement(System.out, [:], workspace)
             new DslScriptLoader(jobManagement).runScript(jobDslScript.text)
         }
+         if (new File(ROOT, "Jenkinsfile").exists()) {
+
+         }
     }
 }
 
@@ -193,4 +196,11 @@ if (GLOBAL_LIBRARY != null) {
     def global_settings = Jenkins.instance.getExtensionList(GlobalLibraries.class)[0]
     global_settings.libraries = [library]
     global_settings.save()
+}
+
+
+// Jenkins.instance.getDescriptor("javaposse.jobdsl.plugin.GobalJobDslSecurityConfiguration").useScriptSecurity = false
+
+if (System.getenv()['DO_NOT_BUILD']){
+    Jenkins.instance.doQuietDown()
 }

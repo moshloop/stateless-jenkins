@@ -1,0 +1,31 @@
+plugins {
+  id "org.jenkins-ci.jpi" version "0.22.0"
+}
+
+
+
+dependencies {
+     compile 'org.apache.httpcomponents:httpclient:4.5.6'
+
+     compile "org.codehaus.groovy:groovy-all:2.4.5"
+    compile "org.jenkins-ci.plugins:job-dsl:1.45@jar"
+    compile "org.jenkins-ci.plugins:job-dsl-core:1.45"
+    compile "org.jenkins-ci.plugins:gradle:1.24@jar"
+    compile "org.jenkins-ci.plugins:git:2.4.0@jar"
+     jenkinsPlugins 'org.jenkins-ci.plugins:job-dsl:1.70@jar'
+}
+
+
+apply plugin: 'groovy'
+
+group = "org.jenkins-ci.plugins"
+version = "0.0.1"
+description = "A description of your plugin"
+
+jenkinsPlugin {
+   coreVersion = '2.98'
+   displayName = 'Jenkins extras'
+   url = 'https://github.com/moshloop/jenkins-extras'
+   gitHubUrl = 'https://github.com/moshloop/jenkins-extras'
+
+}
