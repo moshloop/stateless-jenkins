@@ -41,6 +41,6 @@ COPY plugins.txt $JENKINS_HOME/
 RUN plugins.sh $JENKINS_HOME/plugins.txt
 RUN chown -R jenkins:jenkins $JENKINS_HOME
 USER jenkins
-RUN JENKINS_OPTS=hudson.model.Hudson.killAfterLoad jenkins.sh
+RUN JENKINS_OPTS=hudson.model.Hudson.killAfterLoad=true jenkins.sh
 COPY config.groovy $JENKINS_HOME/init.groovy.d/
 COPY build/libs/stateless-jenkins-0.0.1.jar $JENKINS_HOME/war/WEB-INF/lib/
