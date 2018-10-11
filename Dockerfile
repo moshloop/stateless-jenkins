@@ -38,11 +38,8 @@ RUN chown jenkins:jenkins $JENKINS_HOME
 USER root
 COPY plugins.txt $JENKINS_HOME/
 RUN plugins.sh $JENKINS_HOME/plugins.txt
-COPY debug.groovy $JENKINS_HOME/init.groovy.d/
 RUN chown -R jenkins:jenkins $JENKINS_HOME
-RUN ls $JENKINS_HOME
 USER jenkins
-ENV JENKINS_OPTS=
 ENV JAVA_OPTS="-Dhudson.model.Hudson.killAfterLoad=true"
 # startup jenkins once to create the home directory structure and unpack the plugins
 RUN jenkins.sh
