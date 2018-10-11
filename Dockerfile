@@ -1,12 +1,11 @@
 FROM jenkins/jenkinsfile-runner as JenkinsfileRunner
 FROM jenkins/jenkins:2.143
-ENV JAVA_OPTS=-Djenkins.install.runSetupWizard=false -Dhudson.model.UpdateCenter.never=true
 ENV JENKINS_VER=$JENKINS_VER
 ENV JENKINS_HOME=/var/jenkins_home
 ENV DOCKER_VER=18.06.0
 ENV ANSIBLE_CONFIG /etc/ansible/ansible.cfg
 ARG ANSIBLE_VERSION=2.6.1
-ARG SYSTOOLS_VERSION=3.1
+ARG SYSTOOLS_VERSION=3.2
 ENV ANSIBLE_VERSION=$ANSIBLE_VERSION
 ENV DEBIAN_FRONTEND=noninteractive
 ADD ansible.cfg /etc/ansible/ansible.cfg
@@ -39,8 +38,14 @@ RUN chown jenkins:jenkins $JENKINS_HOME
 USER root
 COPY plugins.txt $JENKINS_HOME/
 RUN plugins.sh $JENKINS_HOME/plugins.txt
+COPY debug.groovy $JENKINS_HOME/init.groovy.d/
 RUN chown -R jenkins:jenkins $JENKINS_HOME
+RUN ls $JENKINS_HOME
 USER jenkins
-RUN JENKINS_OPTS=hudson.model.Hudson.killAfterLoad=true jenkins.sh
+ENV JENKINS_OPTS=
+ENV JAVA_OPTS="-Dhudson.model.Hudson.killAfterLoad=true"
+# startup jenkins once to create the home directory structure and unpack the plugins
+RUN jenkins.sh
+ENV JAVA_OPTS="-Djenkins.install.runSetupWizard=false -Dhudson.model.UpdateCenter.never=true"
 COPY config.groovy $JENKINS_HOME/init.groovy.d/
 COPY build/libs/stateless-jenkins-0.0.1.jar $JENKINS_HOME/war/WEB-INF/lib/
