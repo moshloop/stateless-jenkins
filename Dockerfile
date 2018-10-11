@@ -34,19 +34,15 @@ RUN install_bin https://github.com/moshloop/db-cli/releases/download/1.2/db-cli 
         https://github.com/conjurinc/summon-s3/releases/download/v0.2.0/summon-s3-linux-amd64.tar.gz \
         https://github.com/cyberark/summon-file/releases/download/v0.1.0/summon-file-linux-amd64.tar.gz
 RUN pip install ansible==$ANSIBLE_VERSION ansible-run ansible-deploy ansible-dependencies[all] openpyxl pandas
-RUN chown jenkins:jenkins $JENKINS_HOME
 USER root
+ENV JENKINS_HOME=/var/jenkins
 COPY plugins.txt $JENKINS_HOME/
 RUN plugins.sh $JENKINS_HOME/plugins.txt
 RUN chown -R jenkins:jenkins $JENKINS_HOME
-RUN unzip /usr/share/jenkins/jenkins.war -d $JENKINS_HOME/war
 USER jenkins
 ENV JAVA_OPTS="-Dhudson.model.Hudson.killAfterLoad=true"
 # startup jenkins once to create the home directory structure and unpack the plugins
 RUN jenkins.sh
-RUN ls /var/jenkins_home
-VOLUME /var/jenkins_home
-RUN ls /var/jenkins_home
 ENV JAVA_OPTS="-Djenkins.install.runSetupWizard=false -Dhudson.model.UpdateCenter.never=true"
 COPY config.groovy $JENKINS_HOME/init.groovy.d/
 COPY build/libs/stateless-jenkins-0.0.1.jar  $JENKINS_HOME/war/WEB-INF/lib/
