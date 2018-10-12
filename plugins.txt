@@ -74,6 +74,7 @@ extensible-choice-parameter:1.6.0
 extended-choice-parameter:0.76
 favorite:2.3.2
 filesystem_scm:2.1
+generic-webhook-trigger:1.46
 git-client:2.7.3
 git-parameter:0.9.5
 git-server:1.7
