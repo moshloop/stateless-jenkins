@@ -1,4 +1,5 @@
 package extras
+
 public class Helpers {
     static def checkout(REPO, DEPLOY_KEY) {
         def ROOT = "/tmp/$REPO/"
