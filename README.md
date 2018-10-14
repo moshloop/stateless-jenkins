@@ -1,7 +1,6 @@
 ## Stateless Jenkins
 
-Stateless jenkins is a dockerized configuration of jenkins that is intended to be 100% stateless. i.e. volume persistence is not required.
-
+Stateless jenkins is a batteries included dockerized configuration of jenkins that is intended to be 100% stateless. i.e. volume persistence is not required.
 
 ## Bootstrapping
 
@@ -15,7 +14,7 @@ For each `REPO` stateless-jenkins will:
 * Check for a `Jenkinsfile.repos` text file containing a full repo path per line and recursively clone and bootstrap each repo.
 
 
-** Folder Structure**
+**Folder Structure**
 ```
 
 ├── Jenkinsfile
