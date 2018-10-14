@@ -1,19 +1,78 @@
-### Stateless Jenkins
+## Stateless Jenkins
 
 Stateless jenkins is a dockerized configuration of jenkins that is intended to be 100% stateless. i.e. volume persistence is not required.
 
-Jenkins will automatically create jobs by scanning the root repository for `Jenkinsfile` or `Jenkinsfile.job` [dsl](https://github.com/jenkinsci/job-dsl-plugin) files.
 
-e.g.
+## Bootstrapping
 
-* A  SSH key stored in `/etc/jenkins/keys/ssh-private` will be added to a SSH credential called `deploy`. The public portion of this key should be loaded on Github / Bitbucket as a deploy key allowing Jenkins read only access to the repository.
-* A `Jenkinsfile.job` if found in the root of the repository will be executed
+Stateless jenkins is configure by specifying one or more `REPO`'s as an environment variables. Each `REPO` can either be a local file path or a remote git repo.
+
+For each `REPO` stateless-jenkins will:
+
+* Check for a `Jenkinsfile` and if found create a job with the `REPO` name.
+* Check for a  `jobs` directory and create a new job per file inside the directory.
+* Search for any subdirectory with a `Jenkinsfile` and create a job in a folder for that directory.
+* Check for a `Jenkinsfile.repos` text file containing a full repo path per line and recursively clone and bootstrap each repo.
+
+
+** Folder Structure**
+```
+
+├── Jenkinsfile
+├── jobs
+│   ├── Job 1.jenkinsfile
+│   ├── Job 2.jenkinsfile
+├── Job 3
+│   ├── Jenkinsfile
+
+├── Job 4
+│   ├── Jenkinsfile
+```
+
+
+### Job DSL
+
+You can leverage the [job-dsl-plugin](https://github.com/jenkinsci/job-dsl-plugin) by creating 2 files:
+
+**Jenkinsfile**
+```groovy
+pipeline {
+    agent any
+    triggers {
+        pollSCM("H/5 * * * *")
+    }
+    stages {
+        stage('Update Jobs') {
+            steps {
+              sshagent(['deploy']) {
+                    checkout scm
+                    jobDsl removedConfigFilesAction: 'DELETE', removedJobAction: 'DELETE', removedViewAction: 'DELETE', targets: 'Jenkinsfile.job'
+                }
+            }
+        }
+    }
+}
+```
+
+**Jenkinsfile.job**
+```groovy
+job('PROJ-unit-tests') {
+    scm {
+        git(gitUrl)
+    }
+    triggers {
+        scm('*/15 * * * *')
+    }
+    steps {
+        maven('-e clean test')
+    }
+}
+```
 
 
 ### Image Configuration
 
-Jenkins installed to: `/usr/share/jenkins`:
-  * [Jenkinsfile-runner](https://github.com/jenkinsci/jenkinsfile-runner) installed to `/usr/local/bin/jenkinsfile-runner`
+Jenkins installed to: `/var/jenkins`:
   * Blue Ocean
   * AWS, Azure, AD, LDAP, Bitbucket plugins
 
@@ -29,7 +88,7 @@ Jenkins installed to: `/usr/share/jenkins`:
 * aws cli
 
 
-#### Environment Variables
+### Configuration
 
 | Environment Var  | Required | Description                              |
 | ---------------- | -------- | ---------------------------------------- |
