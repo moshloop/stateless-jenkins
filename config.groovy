@@ -1,28 +1,31 @@
-import jenkins.model.*
-import hudson.security.*
-import hudson.model.*
-import jenkins.install.*
-import java.lang.reflect.*
+import com.cloudbees.jenkins.plugins.sshcredentials.impl.*;
+import com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey.DirectEntryPrivateKeySource;
 import com.cloudbees.plugins.credentials.*
 import com.cloudbees.plugins.credentials.common.*
 import com.cloudbees.plugins.credentials.domains.*
 import com.cloudbees.plugins.credentials.impl.*;
-import javaposse.jobdsl.dsl.DslScriptLoader
-import javaposse.jobdsl.plugin.JenkinsJobManagement
-import javaposse.jobdsl.plugin.GlobalJobDslSecurityConfiguration
-import jenkins.model.GlobalConfiguration
-import com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey.DirectEntryPrivateKeySource;
-import com.cloudbees.jenkins.plugins.sshcredentials.impl.*;
-import hudson.util.*
 import com.michelin.cio.hudson.plugins.rolestrategy.*
+import hudson.model.*
+import hudson.plugins.active_directory.*
+import hudson.security.*
+import hudson.util.*
+import java.lang.reflect.*
+import javaposse.jobdsl.dsl.DslScriptLoader
+import javaposse.jobdsl.plugin.GlobalJobDslSecurityConfiguration
+import javaposse.jobdsl.plugin.JenkinsJobManagement
+import jenkins.install.*
+import jenkins.model.*
 import jenkins.plugins.git.GitSCMSource
 import jenkins.plugins.git.traits.BranchDiscoveryTrait
-import org.jenkinsci.plugins.workflow.libs.GlobalLibraries
-import org.jenkinsci.plugins.workflow.libs.LibraryConfiguration
-import org.jenkinsci.plugins.workflow.libs.SCMSourceRetriever
+import jenkins.security.plugins.ldap.LDAPConfiguration
+import org.jenkinsci.plugins.workflow.libs.*
+import static hudson.security.LDAPSecurityRealm.DescriptorImpl.*
+import static extras.Helpers.*
+import extras.*
+import javaposse.jobdsl.dsl.DslScriptLoader
+import javaposse.jobdsl.plugin.JenkinsJobManagement
 
 System.setProperty("hudson.model.UpdateCenter.pluginDownloadReadTimeoutSeconds", "5")
-
 def DEPLOY_KEY = System.getenv()['DEPLOY_KEY']?:"/etc/jenkins/keys/ssh-private"
 def EMAIL = System.getenv()['EMAIL']?:"noreply@jenkins.local"
 def URL = System.getenv()['URL']?:"http://localhost:8080"
@@ -79,37 +82,13 @@ REPOS = System.getenv()['REPO']
 
 if (REPOS != null) {
     REPOS.split(",").each {REPO ->
-        if (new File(REPO).exists()) {
-            ROOT = REPO
-        } else {
-            ROOT = "/var/jenkins_home/$REPO/"
-            def process = new ProcessBuilder([ "bash", "-c",
-                                              "GIT_SSH_COMMAND='ssh -i ${DEPLOY_KEY} -oStrictHostKeyChecking=no' git clone $REPO $ROOT".toString()])
-                                              .redirectErrorStream(true)
-                                              .start()
-            process.consumeProcessOutput(System.out, System.err)
-            process.waitForOrKill(60000)
-        }
 
-        def jobDslScript = new File(ROOT, "Jenkinsfile.job")
-        if (jobDslScript.exists()) {
-            println("Found Jenkinsfile.job, creating jobs using jobs-dsl")
-            def workspace = new File('.')
-            def jobManagement = new JenkinsJobManagement(System.out, [:], workspace)
-            new DslScriptLoader(jobManagement).runScript(jobDslScript.text)
-        }
-         if (new File(ROOT, "Jenkinsfile").exists()) {
+    new DslScriptLoader(new JenkinsJobManagement(System.out, [:], new File('.')))
+        .runScript(
+            "extras.JobBuilder.build(this, '${REPO}', 'deploy')")
 
-         }
     }
 }
-
-import hudson.security.LDAPSecurityRealm
-import hudson.util.Secret
-import jenkins.model.IdStrategy
-import jenkins.security.plugins.ldap.LDAPConfiguration
-import static hudson.security.LDAPSecurityRealm.DescriptorImpl.*
-import hudson.plugins.active_directory.*
 
 def LDAP_SERVER = System.getenv()['LDAP_SERVER']?:""
 def LDAP_USER = System.getenv()['LDAP_USER']
@@ -197,9 +176,6 @@ if (GLOBAL_LIBRARY != null) {
     global_settings.libraries = [library]
     global_settings.save()
 }
-
-
-// Jenkins.instance.getDescriptor("javaposse.jobdsl.plugin.GobalJobDslSecurityConfiguration").useScriptSecurity = false
 
 if (System.getenv()['DO_NOT_BUILD']){
     Jenkins.instance.doQuietDown()

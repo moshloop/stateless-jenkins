@@ -1,5 +1,8 @@
 package extras
 
+import javaposse.jobdsl.dsl.DslScriptLoader
+import javaposse.jobdsl.plugin.JenkinsJobManagement
+
 public class Helpers {
     static def checkout(REPO, DEPLOY_KEY) {
         def ROOT = "/tmp/$REPO/"
@@ -12,6 +15,12 @@ public class Helpers {
         process.consumeProcessOutput(System.out, System.err)
         process.waitForOrKill(60000)
         return ROOT
+    }
+
+
+    static def evalJobDSL(String text){
+        def jobManagement = new JenkinsJobManagement(System.out, [:], new File('.'))
+        new DslScriptLoader(jobManagement).runScript(text)
     }
 
 }
