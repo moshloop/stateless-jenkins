@@ -13,6 +13,7 @@ For each `REPO` stateless-jenkins will:
 * Search for any subdirectory with a `Jenkinsfile` and create a job in a folder for that directory.
 * Check for a `Jenkinsfile.repos` text file containing a full repo path per line and recursively clone and bootstrap each repo.
 
+#### Example
 
 **Folder Structure**
 ```
@@ -23,11 +24,11 @@ For each `REPO` stateless-jenkins will:
 │   ├── Job 2.jenkinsfile
 ├── Job 3
 │   ├── Jenkinsfile
-
 ├── Job 4
 │   ├── Jenkinsfile
 ```
 
+The above example will create a folder with 5 jobs (1 called `Base` for the root Jenkinsfile)
 
 ### Job DSL
 
