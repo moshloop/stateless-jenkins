@@ -1,4 +1,3 @@
-FROM jenkins/jenkinsfile-runner as JenkinsfileRunner
 FROM jenkins/jenkins:2.143
 ENV JENKINS_VER=$JENKINS_VER
 ENV JENKINS_HOME=/var/jenkins_home
@@ -10,11 +9,12 @@ ENV ANSIBLE_VERSION=$ANSIBLE_VERSION
 ENV DEBIAN_FRONTEND=noninteractive
 ADD ansible.cfg /etc/ansible/ansible.cfg
 USER root
-COPY --from=JenkinsfileRunner /usr/local/bin/jenkinsfile-runner.hpi /usr/local/bin/jenkinsfile-runner.hpi
-COPY --from=JenkinsfileRunner /usr/local/bin/jenkinsfile-runner /usr/local/bin/jenkinsfile-runner
 RUN apt-get update && \
     apt-get install -y python-setuptools python-pip python-dev build-essential jq libkrb5-dev krb5-user wget openssh-client sshpass genisoimage bats git dnsutils nano sudo \
-    libseccomp2 libdevmapper1.02.1 libltdl7 iptables
+    libseccomp2 libdevmapper1.02.1 libltdl7 iptables && \
+    rm -Rf /var/lib/apt/lists/*  && \
+    rm -Rf /usr/share/doc && rm -Rf /usr/share/man  && \
+    apt-get clean
 RUN wget -O systools.deb https://github.com/moshloop/systools/releases/download/${SYSTOOLS_VERSION}/systools_${SYSTOOLS_VERSION}_amd64.deb && dpkg -i systools.deb
 RUN install_bin https://github.com/moshloop/db-cli/releases/download/1.2/db-cli  \
      https://github.com/moshloop/fireviz/releases/download/1.3/fireviz \
@@ -33,16 +33,13 @@ RUN install_bin https://github.com/moshloop/db-cli/releases/download/1.2/db-cli 
         https://github.com/cyberark/summon-aws-secrets/releases/download/v0.1.0/summon-aws-secrets-linux-amd64.tar.gz \
         https://github.com/conjurinc/summon-s3/releases/download/v0.2.0/summon-s3-linux-amd64.tar.gz \
         https://github.com/cyberark/summon-file/releases/download/v0.1.0/summon-file-linux-amd64.tar.gz
-RUN pip install ansible==$ANSIBLE_VERSION ansible-run ansible-deploy ansible-dependencies[all] openpyxl pandas
+RUN pip install ansible==$ANSIBLE_VERSION ansible-run ansible-deploy>=2.6 ansible-dependencies[all] openpyxl pandas
 USER root
 ENV JENKINS_HOME=/var/jenkins
 COPY plugins.txt $JENKINS_HOME/
 RUN plugins.sh $JENKINS_HOME/plugins.txt
 RUN chown -R jenkins:jenkins $JENKINS_HOME
 USER jenkins
-ENV JAVA_OPTS="-Dhudson.model.Hudson.killAfterLoad=true"
-# startup jenkins once to create the home directory structure and unpack the plugins
-RUN jenkins.sh
 ENV JAVA_OPTS="-Djenkins.install.runSetupWizard=false -Dhudson.model.UpdateCenter.never=true"
 COPY config.groovy $JENKINS_HOME/init.groovy.d/
 COPY build/libs/stateless-jenkins-0.0.1.jar  $JENKINS_HOME/war/WEB-INF/lib/
