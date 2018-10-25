@@ -37,6 +37,7 @@ RUN install_bin https://github.com/moshloop/db-cli/releases/download/1.2/db-cli 
         https://github.com/cyberark/summon-file/releases/download/v0.1.0/summon-file-linux-amd64.tar.gz
 RUN pip install ansible==$ANSIBLE_VERSION ansible-run ansible-provision>=2.0 ansible-deploy>=2.6 ansible-dependencies[all] openpyxl pandas
 ENV JENKINS_HOME=/var/jenkins
+RUN usermod -d $JENKINS_HOME jenkins
 COPY plugins.txt $JENKINS_HOME/
 RUN plugins.sh $JENKINS_HOME/plugins.txt
 RUN chown -R jenkins:jenkins $JENKINS_HOME
