@@ -36,13 +36,12 @@ RUN install_bin https://github.com/moshloop/db-cli/releases/download/1.2/db-cli 
         https://github.com/conjurinc/summon-s3/releases/download/v0.2.0/summon-s3-linux-amd64.tar.gz \
         https://github.com/cyberark/summon-file/releases/download/v0.1.0/summon-file-linux-amd64.tar.gz
 RUN pip install ansible==$ANSIBLE_VERSION ansible-run ansible-provision>=2.0 ansible-deploy>=2.6 ansible-dependencies[all] openpyxl pandas
-RUN ansible-provision install
-USER root
 ENV JENKINS_HOME=/var/jenkins
 COPY plugins.txt $JENKINS_HOME/
 RUN plugins.sh $JENKINS_HOME/plugins.txt
 RUN chown -R jenkins:jenkins $JENKINS_HOME
 USER jenkins
+RUN ansible-provision install
 ENV JAVA_OPTS="-Dhudson.model.Hudson.killAfterLoad=true"
 # startup jenkins once to create the home directory structure and unpack the plugins
 RUN jenkins.sh
