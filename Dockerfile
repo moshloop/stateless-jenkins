@@ -25,6 +25,7 @@ RUN install_bin https://github.com/moshloop/db-cli/releases/download/1.2/db-cli 
      https://releases.hashicorp.com/packer/1.2.4/packer_1.2.4_linux_amd64.zip \
      https://github.com/genuinetools/reg/releases/download/v0.15.3/reg-linux-amd64 \
      https://master.dockerproject.org/linux/x86_64/docker && \
+     https://storage.googleapis.com/kubernetes-release/release/v1.12.0/bin/linux/amd64/kubectl && \
      mv /usr/bin/reg-linux-amd64 /usr/bin/reg && \
      install_deb \
          https://github.com/cyberark/summon/releases/download/v0.6.7/summon.deb \
