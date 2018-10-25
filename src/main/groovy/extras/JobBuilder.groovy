@@ -31,7 +31,7 @@ public class JobBuilder {
             }
             hasFolder = true
             dsl.folder(folder)
-            def name = folder + "/" + path.replaceAll("/", "")
+            def name = folder.name.split("\\.")[0]
             new JobBuilder(dsl, name, REPO, CREDS)
                 .addJenkinsfile("${path}Jenkinsfile", 'master',"${path}.*")
                 .parseTriggers()
