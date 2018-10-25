@@ -4,7 +4,7 @@ ENV JENKINS_HOME=/var/jenkins_home
 ENV DOCKER_VER=18.06.0
 ENV ANSIBLE_CONFIG /etc/ansible/ansible.cfg
 ARG ANSIBLE_VERSION=2.6.1
-ARG SYSTOOLS_VERSION=3.2
+ARG SYSTOOLS_VERSION=3.6
 ENV ANSIBLE_VERSION=$ANSIBLE_VERSION
 ENV DEBIAN_FRONTEND=noninteractive
 ADD ansible.cfg /etc/ansible/ansible.cfg
@@ -26,6 +26,8 @@ RUN install_bin https://github.com/moshloop/db-cli/releases/download/1.2/db-cli 
      https://github.com/genuinetools/reg/releases/download/v0.15.3/reg-linux-amd64 \
      https://master.dockerproject.org/linux/x86_64/docker && \
      https://storage.googleapis.com/kubernetes-release/release/v1.12.0/bin/linux/amd64/kubectl && \
+     https://storage.googleapis.com/kubernetes-helm/helm-v2.11.0-linux-amd64.tar.gz && \
+     https://github.com/kubernetes-sigs/kustomize/releases/download/v1.0.9/kustomize_1.0.9_linux_amd64 && \
      mv /usr/bin/reg-linux-amd64 /usr/bin/reg && \
      install_deb \
          https://github.com/cyberark/summon/releases/download/v0.6.7/summon.deb \
