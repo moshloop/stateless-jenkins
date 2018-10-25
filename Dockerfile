@@ -15,7 +15,7 @@ RUN apt-get update && \
     rm -Rf /var/lib/apt/lists/*  && \
     rm -Rf /usr/share/doc && rm -Rf /usr/share/man  && \
     apt-get clean
-RUN wget -O systools.deb https://github.com/moshloop/systools/releases/download/${SYSTOOLS_VERSION}/systools_${SYSTOOLS_VERSION}_amd64.deb && dpkg -i systools.deb
+RUN wget https://github.com/moshloop/systools/releases/download/${SYSTOOLS_VERSION}/systools.deb && dpkg -i systools.deb
 RUN install_bin https://github.com/moshloop/db-cli/releases/download/1.2/db-cli  \
      https://github.com/moshloop/fireviz/releases/download/1.3/fireviz \
      https://github.com/moshloop/waiter/releases/download/1.1/waiter \
