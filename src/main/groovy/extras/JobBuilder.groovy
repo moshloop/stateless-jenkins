@@ -19,7 +19,9 @@ public class JobBuilder {
         def jenkinsfile = new File(ROOT, 'Jenkinsfile')
         "find ${ROOT} -name Jenkinsfile".execute().text.eachLine {
             def path = new File(it).parentFile.absolutePath.replaceAll(ROOT, "");
+            println "Found $it with path: $path"
             if (it == jenkinsfile.absolutePath) {
+                println "Skipping root: ${jenkinsfile.absolutePath}"
                 return
             }
 
@@ -31,7 +33,7 @@ public class JobBuilder {
             }
             hasFolder = true
             dsl.folder(folder)
-            def name = folder.name.split("\\.")[0]
+            def name = new File(it).parentFile.name
             new JobBuilder(dsl, name, REPO, CREDS)
                 .addJenkinsfile("${path}Jenkinsfile", 'master',"${path}.*")
                 .parseTriggers()
@@ -63,6 +65,7 @@ public class JobBuilder {
     }
 
     public JobBuilder(def dsl, String name, String repo, String credential) {
+        println "new job $name: $repo"
         def THIS = this
         this.repo = repo
         dsl.pipelineJob(name) {
