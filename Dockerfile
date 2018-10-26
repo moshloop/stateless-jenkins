@@ -23,7 +23,7 @@ RUN install_bin https://github.com/moshloop/db-cli/releases/download/1.2/db-cli 
      https://github.com/vmware/govmomi/releases/download/v0.18.0/govc_linux_386.gz \
      https://github.com/ivanilves/lstags/releases/download/v1.1.0/lstags-linux-v1.1.0.tar.gz
  RUN bin_name=reg install_bin https://github.com/genuinetools/reg/releases/download/v0.15.3/reg-linux-amd64
- RUN install_binhttps://releases.hashicorp.com/packer/1.2.4/packer_1.2.4_linux_amd64.zip \
+ RUN install_bin https://releases.hashicorp.com/packer/1.2.4/packer_1.2.4_linux_amd64.zip \
      https://master.dockerproject.org/linux/x86_64/docker \
      https://storage.googleapis.com/kubernetes-release/release/v1.12.0/bin/linux/amd64/kubectl \
      https://storage.googleapis.com/kubernetes-helm/helm-v2.11.0-linux-amd64.tar.gz \
