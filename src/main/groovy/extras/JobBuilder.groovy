@@ -85,7 +85,7 @@ public class JobBuilder {
                     git {
                         remote {
                             url(this.repo)
-                            credentials(this.credential)
+                            credentials('deploy')
                         }
                         if (restriction != null ) {
                             configure { gitScm ->
