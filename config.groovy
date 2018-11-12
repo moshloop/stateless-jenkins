@@ -28,12 +28,22 @@ import javaposse.jobdsl.plugin.JenkinsJobManagement
 System.setProperty("hudson.model.UpdateCenter.pluginDownloadReadTimeoutSeconds", "5")
 def DEPLOY_KEY = System.getenv()['DEPLOY_KEY']?:"/etc/jenkins/keys/ssh-private"
 def EMAIL = System.getenv()['EMAIL']?:"noreply@jenkins.local"
+def API_USER = System.getenv()['API_USER']
+def API_PASS = System.getenv()['API_PASS']
 def URL = System.getenv()['URL']?:"http://localhost:8080"
 def ADMIN_USER = System.getenv()['ADMIN_USER']?:"admin"
 def ADMIN_PASS = System.getenv()['ADMIN_PASS']
+def ADMIN_GROUP = System.getenv()['ADMIN_GROUP']?:"Jenkins Admin"
+def READ_GROUP = System.getenv()['READ_GROUP']?:"authenticated"
+def LDAP_SERVER = System.getenv()['LDAP_SERVER']?:""
+def LDAP_USER = System.getenv()['LDAP_USER']
+def LDAP_PASS = System.getenv()['LDAP_PASS']
+def LDAP_ROOT = System.getenv()['LDAP_ROOT']
+def AD_SERVER = System.getenv()['AD_SERVER']?:""
+def GLOBAL_LIBRARY = System.getenv()['GLOBAL_SHARED_LIBRARY']
 
-if (ADMIN_PASS == null) {
-     ADMIN_PASS = new File("/var/jenkins_home/secrets/initialAdminPassword").text
+if (ADMIN_PASS == null && LDAP_SERVER == "" && AD_SERVER == "") {
+     ADMIN_PASS = new File("${System.getenv()['JENKINS_HOME']}/secrets/initialAdminPassword").text
 }
 
 jenkins = Jenkins.instance
@@ -58,9 +68,9 @@ if (DEPLOY_KEY != null) {
     credentials.addCredentials( Domain.global(), ssh)
 }
 
-if (System.getenv()['API_USER'] != null) {
+if (API_USER != null) {
     println "Adding api credentials"
-    def bitbucket = new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL,"api", "api", System.getenv()['API_USER'], System.getenv()['API_PASS'])
+    def bitbucket = new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL,"api", "api", System.getenv()['API_USER'],API_PASS)
     credentials.addCredentials( Domain.global(), bitbucket)
 
     def bitbucketBuildStatusNotifier = jenkins.getDescriptorByType(org.jenkinsci.plugins.bitbucket.BitbucketBuildStatusNotifier.DescriptorImpl)
@@ -89,11 +99,6 @@ if (REPOS != null) {
     }
 }
 
-def LDAP_SERVER = System.getenv()['LDAP_SERVER']?:""
-def LDAP_USER = System.getenv()['LDAP_USER']
-def LDAP_PASS = System.getenv()['LDAP_PASS']
-def LDAP_ROOT = System.getenv()['LDAP_ROOT']
-
 if( LDAP_SERVER != "" && !(jenkins.securityRealm instanceof LDAPSecurityRealm)) {
     println("Configuring LDAP authentication")
     LDAPConfiguration conf = new LDAPConfiguration(LDAP_SERVER, LDAP_ROOT, true,LDAP_USER, Secret.fromString(LDAP_PASS));
@@ -111,9 +116,6 @@ if( LDAP_SERVER != "" && !(jenkins.securityRealm instanceof LDAPSecurityRealm)) 
             IdStrategy.CASE_INSENSITIVE)
     jenkins.save()
 }
-
-
-def AD_SERVER = System.getenv()['AD_SERVER']?:""
 
 if (AD_SERVER != "" && !(jenkins.securityRealm instanceof ActiveDirectorySecurityRealm)) {
     jenkins.securityRealm = new ActiveDirectorySecurityRealm(
@@ -139,7 +141,7 @@ if (AD_SERVER != "" || LDAP_SERVER != "" ) {
 
     Role adminRole = new Role('admin',new HashSet(Permission.all));
     roles.addRole(RoleBasedAuthorizationStrategy.GLOBAL, adminRole);
-    roles.assignRole(RoleBasedAuthorizationStrategy.GLOBAL, adminRole, System.getenv()['ADMIN_GROUP']?:"Jenkins Admins");
+    roles.assignRole(RoleBasedAuthorizationStrategy.GLOBAL, adminRole, ADMIN_GROUP);
 
     Set<Permission> readOnly = new HashSet<Permission>();
     readOnly.add(Permission.fromId("hudson.model.Hudson.Read"));
@@ -147,7 +149,7 @@ if (AD_SERVER != "" || LDAP_SERVER != "" ) {
 
     Role authenticatedRole = new Role('read', readOnly);
     roles.addRole(RoleBasedAuthorizationStrategy.GLOBAL, authenticatedRole);
-    roles.assignRole(RoleBasedAuthorizationStrategy.GLOBAL, authenticatedRole, System.getenv()['READ_GROUP']?:"authenticated");
+    roles.assignRole(RoleBasedAuthorizationStrategy.GLOBAL, authenticatedRole, READ_GROUP);
 
     jenkins.save()
 }
@@ -157,7 +159,7 @@ if (System.getenv()['DISABLE_DSL_SECURITY']?:"false" == "true") {
     GlobalConfiguration.all().get(GlobalJobDslSecurityConfiguration.class).save()
 }
 
-GLOBAL_LIBRARY = System.getenv()['GLOBAL_SHARED_LIBRARY']
+
 if (GLOBAL_LIBRARY != null) {
     println "Loading global library from: ${GLOBAL_LIBRARY}"
 
