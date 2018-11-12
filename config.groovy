@@ -22,8 +22,6 @@ import org.jenkinsci.plugins.workflow.libs.*
 import static hudson.security.LDAPSecurityRealm.DescriptorImpl.*
 import static extras.Helpers.*
 import extras.*
-import javaposse.jobdsl.dsl.DslScriptLoader
-import javaposse.jobdsl.plugin.JenkinsJobManagement
 
 System.setProperty("hudson.model.UpdateCenter.pluginDownloadReadTimeoutSeconds", "5")
 def DEPLOY_KEY = System.getenv()['DEPLOY_KEY']?:"/etc/jenkins/keys/ssh-private"
@@ -41,6 +39,7 @@ def LDAP_PASS = System.getenv()['LDAP_PASS']
 def LDAP_ROOT = System.getenv()['LDAP_ROOT']
 def AD_SERVER = System.getenv()['AD_SERVER']?:""
 def GLOBAL_LIBRARY = System.getenv()['GLOBAL_SHARED_LIBRARY']
+def REPOS = System.getenv()['REPO']
 
 if (ADMIN_PASS == null && LDAP_SERVER == "" && AD_SERVER == "") {
      ADMIN_PASS = new File("${System.getenv()['JENKINS_HOME']}/secrets/initialAdminPassword").text
@@ -88,16 +87,6 @@ location.setAdminAddress(EMAIL)
 location.setUrl(URL)
 location.save()
 
-REPOS = System.getenv()['REPO']
-
-if (REPOS != null) {
-    REPOS.split(",").each {REPO ->
-
-    new DslScriptLoader(new JenkinsJobManagement(System.out, [:], new File('.')))
-        .runScript(
-            "extras.JobBuilder.build(this, '${REPO}', '${DEPLOY_KEY}')")
-    }
-}
 
 if( LDAP_SERVER != "" && !(jenkins.securityRealm instanceof LDAPSecurityRealm)) {
     println("Configuring LDAP authentication")
@@ -177,6 +166,16 @@ if (GLOBAL_LIBRARY != null) {
     global_settings.libraries = [library]
     global_settings.save()
 }
+
+if (REPOS != null) {
+    REPOS.split(",").each {REPO ->
+
+    new DslScriptLoader(new JenkinsJobManagement(System.out, [:], new File('.')))
+        .runScript(
+            "extras.JobBuilder.build(this, '${REPO}', '${DEPLOY_KEY}')")
+    }
+}
+
 
 if (System.getenv()['DO_NOT_BUILD']){
     Jenkins.instance.doQuietDown()
