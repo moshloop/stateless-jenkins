@@ -1,5 +1,6 @@
 package extras
-
+import javaposse.jobdsl.dsl.DslScriptLoader
+import javaposse.jobdsl.plugin.JenkinsJobManagement
 import static extras.Helpers.*
 
 public class JobBuilder {
@@ -9,6 +10,7 @@ public class JobBuilder {
     def repo
 
     public static void build(def dsl, REPO, CREDS) {
+        println "Building $REPO with creds=$CREDS"
         def ROOT = REPO
         if (!new File(ROOT).exists()) {
             ROOT = checkout(REPO, CREDS)
@@ -34,21 +36,30 @@ public class JobBuilder {
             hasFolder = true
             dsl.folder(folder)
             def name = new File(it).parentFile.name
-            new JobBuilder(dsl, name, REPO, CREDS)
+            new JobBuilder(dsl, folder + "/" + name, REPO, CREDS)
                 .addJenkinsfile("${path}Jenkinsfile", 'master',"${path}.*")
                 .parseTriggers()
         }
 
         if (jenkinsfile.exists()) {
+            println "Adding base Jenkinsfiles"
             def name = hasFolder ? folder + "/Base" : folder
             new JobBuilder(dsl, name, REPO, CREDS)
               .addJenkinsfile()
               .parseTriggers(jenkinsfile.text)
         }
 
+        def jobDsl = new File(ROOT, "Jenkinsfile.job")
+        if (jojobDslb.exists()) {
+            println "Adding Jenkinsfile.job for " + REPO
+            new DslScriptLoader(new JenkinsJobManagement(System.out, [:], new File('.')))
+                .runScript(jobDsl.text)
+        }
+
         if (new File(ROOT, "jobs").exists()) {
             new File(ROOT, "jobs").listFiles().each { job ->
                 def name = job.name.split("\\.")[0]
+                println "Adding job $name"
                 new JobBuilder(dsl, name, REPO, CREDS)
                   .addJenkinsfile("jobs/${job.name}")
                   .parseTriggers(job.text)
@@ -59,6 +70,7 @@ public class JobBuilder {
         def repos = new File(ROOT, "Jenkinsfile.repos")
         if (repos.exists()) {
             repos.text.eachLine {repo ->
+                println "Initializing repo: $repo"
                 JobBuilder.build(dsl, repo, CREDS)
             }
         }
