@@ -50,7 +50,7 @@ public class JobBuilder {
         }
 
         def jobDsl = new File(ROOT, "Jenkinsfile.job")
-        if (jojobDslb.exists()) {
+        if (jobDsl.exists()) {
             println "Adding Jenkinsfile.job for " + REPO
             new DslScriptLoader(new JenkinsJobManagement(System.out, [:], new File('.')))
                 .runScript(jobDsl.text)
