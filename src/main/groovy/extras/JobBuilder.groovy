@@ -1,6 +1,4 @@
 package extras
-import javaposse.jobdsl.dsl.DslScriptLoader
-import javaposse.jobdsl.plugin.JenkinsJobManagement
 import static extras.Helpers.*
 
 public class JobBuilder {
@@ -47,13 +45,6 @@ public class JobBuilder {
             new JobBuilder(dsl, name, REPO, CREDS)
               .addJenkinsfile()
               .parseTriggers(jenkinsfile.text)
-        }
-
-        def jobDsl = new File(ROOT, "Jenkinsfile.job")
-        if (jobDsl.exists()) {
-            println "Adding Jenkinsfile.job for " + REPO
-            new DslScriptLoader(new JenkinsJobManagement(System.out, [:], new File('.')))
-                .runScript(jobDsl.text)
         }
 
         if (new File(ROOT, "jobs").exists()) {
