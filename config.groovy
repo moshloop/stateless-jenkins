@@ -4,7 +4,6 @@ import com.cloudbees.plugins.credentials.*
 import com.cloudbees.plugins.credentials.common.*
 import com.cloudbees.plugins.credentials.domains.*
 import com.cloudbees.plugins.credentials.impl.*;
-import com.michelin.cio.hudson.plugins.rolestrategy.*
 import hudson.model.*
 import hudson.plugins.active_directory.*
 import hudson.security.*
@@ -23,7 +22,7 @@ import static hudson.security.LDAPSecurityRealm.DescriptorImpl.*
 import static extras.Helpers.*
 import extras.*
 
-System.setProperty("hudson.model.UpdateCenter.pluginDownloadReadTimeoutSeconds", "5")
+System.setProperty("hudson.model.UpdateCenter.never", "true")
 def DEPLOY_KEY = System.getenv()['DEPLOY_KEY']?:"/etc/jenkins/keys/ssh-private"
 def EMAIL = System.getenv()['EMAIL']?:"noreply@jenkins.local"
 def API_USER = System.getenv()['API_USER']
@@ -50,8 +49,6 @@ jenkins = Jenkins.instance
 def hudsonRealm = new HudsonPrivateSecurityRealm(false)
 hudsonRealm.createAccount(ADMIN_USER, ADMIN_PASS)
 jenkins.setSecurityRealm(hudsonRealm)
-
-jenkins.setAuthorizationStrategy(new FullControlOnceLoggedInAuthorizationStrategy())
 
 if (System.getenv()['DISABLE_CSRF'] == "true") {
     jenkins.setCrumbIssuer(null)
@@ -118,28 +115,10 @@ if (AD_SERVER != "" && !(jenkins.securityRealm instanceof ActiveDirectorySecurit
 }
 
 if (AD_SERVER != "" || LDAP_SERVER != "" ) {
-    RoleBasedAuthorizationStrategy roles = new RoleBasedAuthorizationStrategy()
+    ProjectMatrixAuthorizationStrategy roles = new ProjectMatrixAuthorizationStrategy()
+    strategy.add(Jenkins.ADMINISTER, ADMIN_GROUP)
+    strategy.add(Jenkins.READ, READ_GROUP)
     jenkins.setAuthorizationStrategy(roles)
-
-    Constructor[] constrs = Role.class.getConstructors();
-    for (Constructor<?> c : constrs) {
-      c.setAccessible(true);
-    }
-
-    RoleBasedAuthorizationStrategy.class.getDeclaredMethod("assignRole", String.class, Role.class, String.class).setAccessible(true);
-
-    Role adminRole = new Role('admin',new HashSet(Permission.all));
-    roles.addRole(RoleBasedAuthorizationStrategy.GLOBAL, adminRole);
-    roles.assignRole(RoleBasedAuthorizationStrategy.GLOBAL, adminRole, ADMIN_GROUP);
-
-    Set<Permission> readOnly = new HashSet<Permission>();
-    readOnly.add(Permission.fromId("hudson.model.Hudson.Read"));
-    readOnly.add(Permission.fromId("hudson.model.View.Read"));
-
-    Role authenticatedRole = new Role('read', readOnly);
-    roles.addRole(RoleBasedAuthorizationStrategy.GLOBAL, authenticatedRole);
-    roles.assignRole(RoleBasedAuthorizationStrategy.GLOBAL, authenticatedRole, READ_GROUP);
-
     jenkins.save()
 }
 
@@ -169,11 +148,11 @@ if (GLOBAL_LIBRARY != null) {
 
 if (REPOS != null) {
     REPOS.split(",").each {REPO ->
-
-    new DslScriptLoader(new JenkinsJobManagement(System.out, [:], new File('.')))
-        .runScript(
-            "extras.JobBuilder.build(this, '${REPO}', '${DEPLOY_KEY}')")
+        new DslScriptLoader(new JenkinsJobManagement(System.out, [:], new File('.')))
+            .runScript("extras.JobBuilder.build(this, '${REPO}', '${DEPLOY_KEY}')")
     }
+
+
 }
 
 

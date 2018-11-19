@@ -1,11 +1,15 @@
 package extras
 import static extras.Helpers.*
+import hudson.model.*
+import hudson.security.*
+import hudson.util.*
 
 public class JobBuilder {
 
     def job
     def credential
     def repo
+    def name
 
     public static void build(def dsl, REPO, CREDS) {
         println "Building $REPO with creds=$CREDS"
@@ -17,6 +21,7 @@ public class JobBuilder {
         def hasFolder = false
         def folder = new File(ROOT).name
         def jenkinsfile = new File(ROOT, 'Jenkinsfile')
+        def owners = new File(ROOT, "OWNERS")
         "find ${ROOT} -name Jenkinsfile".execute().text.eachLine {
             def path = new File(it).parentFile.absolutePath.replaceAll(ROOT, "");
             println "Found $it with path: $path"
@@ -36,7 +41,8 @@ public class JobBuilder {
             def name = new File(it).parentFile.name
             new JobBuilder(dsl, folder + "/" + name, REPO, CREDS)
                 .addJenkinsfile("${path}Jenkinsfile", 'master',"${path}.*")
-                .parseTriggers()
+                .parseTriggers(new File(it).text)
+                .parseOwners(new File(new File(it).parentFile, 'OWNERS'))
         }
 
         if (jenkinsfile.exists()) {
@@ -45,6 +51,7 @@ public class JobBuilder {
             new JobBuilder(dsl, name, REPO, CREDS)
               .addJenkinsfile()
               .parseTriggers(jenkinsfile.text)
+              .parseOwners(owners)
         }
 
         if (new File(ROOT, "jobs").exists()) {
@@ -54,6 +61,7 @@ public class JobBuilder {
                 new JobBuilder(dsl, name, REPO, CREDS)
                   .addJenkinsfile("jobs/${job.name}")
                   .parseTriggers(job.text)
+                  .parseOwners(owners)
             }
         }
 
@@ -71,6 +79,7 @@ public class JobBuilder {
         println "new job $name: $repo"
         def THIS = this
         this.repo = repo
+        this.name = name
         dsl.pipelineJob(name) {
             THIS.job = delegate
         }
@@ -102,6 +111,19 @@ public class JobBuilder {
                         extensions {} // required as otherwise it may try to tag the repo, which you may not want
                     }
                 }
+            }
+        }
+        return this
+    }
+
+    public JobBuilder parseOwners(File owners) {
+        if (!owners.exists()) {
+            return this
+        }
+        println "Parsing OWNERS for ${this.name}"
+        this.job.authorization {
+            for (String owner : owners.text.split("\n")) {
+                permission('hudson.model.Item.Build', owner)
             }
         }
         return this

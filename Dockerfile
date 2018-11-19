@@ -50,3 +50,4 @@ RUN jenkins.sh
 ENV JAVA_OPTS="-Djenkins.install.runSetupWizard=false -Dhudson.model.UpdateCenter.never=true"
 COPY config.groovy $JENKINS_HOME/init.groovy.d/
 COPY build/libs/stateless-jenkins-0.0.1.jar  $JENKINS_HOME/war/WEB-INF/lib/
+COPY jenkins.sh /usr/local/bin/jenkins.sh

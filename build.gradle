@@ -5,13 +5,14 @@ plugins {
 
 
 dependencies {
-     compile 'org.apache.httpcomponents:httpclient:4.5.6'
-
-     compile "org.codehaus.groovy:groovy-all:2.4.5"
+    compile 'org.apache.httpcomponents:httpclient:4.5.6'
+    compile "org.codehaus.groovy:groovy-all:2.4.5"
     compile "org.jenkins-ci.plugins:job-dsl:1.45@jar"
     compile "org.jenkins-ci.plugins:job-dsl-core:1.45"
     compile "org.jenkins-ci.plugins:gradle:1.24@jar"
     compile "org.jenkins-ci.plugins:git:2.4.0@jar"
+    compile "org.jenkins-ci.plugins:role-strategy:2.6.1@jar"
+    compile "org.jenkins-ci.plugins:matrix-auth:2.3@jar"
 }
 
 
