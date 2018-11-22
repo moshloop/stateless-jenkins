@@ -1,6 +1,8 @@
 #! /bin/bash -e
 
-echo "Startiing jenkins using $REPO"
+echo "Starting jenkins using $REPO"
+mkdir ~/.ssh
+
 : "${JENKINS_WAR:="/usr/share/jenkins/jenkins.war"}"
 : "${JENKINS_HOME:="/var/jenkins_home"}"
 touch "${COPY_REFERENCE_FILE_LOG}" || { echo "Can not write to ${COPY_REFERENCE_FILE_LOG}. Wrong volume permissions?"; exit 1; }
@@ -11,7 +13,7 @@ PRIMARY_REPO=$(echo $REPO | cut -d, -f1)
 ROOT=$PRIMARY_REPO
 if [[ ! -e $ROOT ]]; then
   ROOT=/tmp/repo
-  GIT_SSH_COMMAND='ssh -i $DEPLOY_KEY -oStrictHostKeyChecking=no'
+  GIT_SSH_COMMAND="ssh -i $DEPLOY_KEY -oStrictHostKeyChecking=no"
   git clone $PRIMARY_REPO $ROOT
 fi
 
