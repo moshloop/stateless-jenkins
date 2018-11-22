@@ -116,8 +116,8 @@ if (AD_SERVER != "" && !(jenkins.securityRealm instanceof ActiveDirectorySecurit
 
 if (AD_SERVER != "" || LDAP_SERVER != "" ) {
     ProjectMatrixAuthorizationStrategy roles = new ProjectMatrixAuthorizationStrategy()
-    strategy.add(Jenkins.ADMINISTER, ADMIN_GROUP)
-    strategy.add(Jenkins.READ, READ_GROUP)
+    roles.add(Jenkins.ADMINISTER, ADMIN_GROUP)
+    roles.add(Jenkins.READ, READ_GROUP)
     jenkins.setAuthorizationStrategy(roles)
     jenkins.save()
 }
