@@ -22,6 +22,11 @@ if [[ -e $ROOT/jenkins.yaml ]]; then
 fi
 
 
+for plugin in $CUSTOM_PLUGINS; do
+  echo "Downloading plugin $plugin"
+  wget -O $JENKINS_HOME/plugins/$(basename $plugin) $plugin
+done
+
 # if `docker run` first argument start with `--` the user is passing jenkins launcher arguments
 if [[ $# -lt 1 ]] || [[ "$1" == "--"* ]]; then
 
