@@ -88,7 +88,7 @@ groovy-postbuild:2.4.3
 handlebars:1.1.1
 handy-uri-templates-2-api:2.1.6-1.0
 htmlpublisher:1.17
-jackson2-api:2.7.3
+jackson2-api:2.8.11.3
 javadoc:1.4
 jdk-tool:1.1
 jenkins-design-language:1.9.0
@@ -102,6 +102,7 @@ junit:1.26.1
 kubernetes-cd:0.2.3
 kubernetes-credentials:0.4.0
 ldap:1.20
+lockable-resources:2.3
 mailer:1.22
 mapdb-api:1.0.9.0
 matrix-auth:2.3
