@@ -1,4 +1,4 @@
-FROM jenkins/jenkins:2.143
+FROM jenkins/jenkins:2.153
 ENV JENKINS_VER=$JENKINS_VER
 ENV JENKINS_HOME=/var/jenkins_home
 ENV DOCKER_VER=18.06.0
