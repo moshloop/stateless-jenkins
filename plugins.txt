@@ -88,7 +88,7 @@ groovy-postbuild:2.4.3
 handlebars:1.1.1
 handy-uri-templates-2-api:2.1.6-1.0
 htmlpublisher:1.17
-jackson2-api:2.8.11.3
+jackson2-api:2.9.7.1
 javadoc:1.4
 jdk-tool:1.1
 jenkins-design-language:1.9.0
