@@ -10,7 +10,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 ADD ansible.cfg /etc/ansible/ansible.cfg
 USER root
 RUN apt-get update && \
-    apt-get install -y python-setuptools python-pip python-dev build-essential jq libkrb5-dev krb5-user wget openssh-client sshpass genisoimage bats git dnsutils nano sudo \
+    apt-get install -y python-setuptools python-pip python-dev build-essential jq libkrb5-dev krb5-user wget openssh-client sshpass genisoimage bats git dnsutils nano sudo gnupg2 \
     libseccomp2 libdevmapper1.02.1 libltdl7 iptables && \
     rm -Rf /var/lib/apt/lists/*  && \
     rm -Rf /usr/share/doc && rm -Rf /usr/share/man  && \
@@ -19,7 +19,7 @@ RUN wget https://github.com/moshloop/systools/releases/download/${SYSTOOLS_VERSI
 RUN install_bin https://github.com/moshloop/db-cli/releases/download/1.2/db-cli  \
      https://github.com/moshloop/fireviz/releases/download/1.3/fireviz \
      https://github.com/moshloop/waiter/releases/download/1.1/waiter \
-     https://github.com/moshloop/smarti/releases/download/0.7/smarti
+     https://github.com/moshloop/smarti/releases/download/0.11/smarti
  RUN bin_name=reg install_bin https://github.com/genuinetools/reg/releases/download/v0.15.3/reg-linux-amd64
  RUN install_bin https://releases.hashicorp.com/packer/1.2.4/packer_1.2.4_linux_amd64.zip && \
      install_bin https://github.com/vmware/govmomi/releases/download/v0.18.0/govc_linux_386.gz && \
