@@ -12,8 +12,15 @@ ROOT=$PRIMARY_REPO
 if [[ ! -e $ROOT ]]; then
   ROOT=/tmp/repo
   export GIT_SSH_COMMAND="ssh -i $DEPLOY_KEY -oStrictHostKeyChecking=no"
-  echo $GIT_SSH_COMMAND
+  BRANCH=master
+  if [[ "$PRIMARY_REPO" = *?branch=* ]]; then
+    BRANCH=$(python -c "import sys; print sys.argv[1].split('?branch=')[1]" $PRIMARY_REPO)
+  fi
+  PRIMARY_REPO=$(python -c "import sys; print sys.argv[1].split('?branch=')[0]" $PRIMARY_REPO)
   git clone $PRIMARY_REPO $ROOT
+  cd $ROOT
+  git checkout $BRANCH
+
 fi
 
 if [[ -e $ROOT/jenkins.yaml ]]; then

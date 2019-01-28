@@ -10,6 +10,7 @@ public class JobBuilder {
     def credential
     def repo
     def name
+    def branch = 'master'
 
     public static void build(def dsl, REPO, CREDS) {
         println "Building $REPO with creds=$CREDS"
@@ -40,7 +41,7 @@ public class JobBuilder {
             dsl.folder(folder)
             def name = new File(it).parentFile.name
             new JobBuilder(dsl, folder + "/" + name, REPO, CREDS)
-                .addJenkinsfile("${path}Jenkinsfile", 'master',"${path}.*")
+                .addJenkinsfile("${path}Jenkinsfile", "${path}.*")
                 .parseTriggers(new File(it).text)
                 .parseOwners(new File(new File(it).parentFile, 'OWNERS'))
         }
@@ -78,7 +79,11 @@ public class JobBuilder {
     public JobBuilder(def dsl, String name, String repo, String credential) {
         println "new job $name: $repo"
         def THIS = this
-        this.repo = repo
+        this.repo = repo.split("\\?branch=")[0]
+        if (repo.contains("?branch=")) {
+            this.branch = repo.split("\\?branch=")[1]
+        }
+
         this.name = name
         dsl.pipelineJob(name) {
             THIS.job = delegate
@@ -90,7 +95,7 @@ public class JobBuilder {
         return this.job
     }
 
-    public JobBuilder addJenkinsfile(path = 'Jenkinsfile', branch = 'master', restriction = null) {
+    public JobBuilder addJenkinsfile(path = 'Jenkinsfile', restriction = null) {
         this.job.definition {
             cpsScm {
                 scm {
@@ -106,7 +111,7 @@ public class JobBuilder {
                                 }
                             }
                         }
-                        branches(branch)
+                        branches(this.branch)
                         scriptPath(path)
                         extensions {} // required as otherwise it may try to tag the repo, which you may not want
                     }

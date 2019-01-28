@@ -92,7 +92,7 @@ Jenkins installed to: `/var/jenkins`:
 
 | Environment Var  | Required | Description                              |
 | ---------------- | -------- | ---------------------------------------- |
-| REPO             | Yes      | Git repo ( e.g. `ssh://git@github.com/acme/jenkins-config` or `/work/repos/jenkins-config`) |
+| REPO             | Yes      | Git repo ( e.g. `ssh://git@github.com/acme/jenkins-config` or `/work/repos/jenkins-config`, Branches can be specified using `?branch=`) |
 | DEPLOY_KEY       | No       | Path to a SSH deploy private key, can be referenced in jobs using `deploy` credential id.  defaults to `/etc/jenkins/keys/ssh-private` |
 | GLOBAL_SHARED_LIBRARY | No | Git repo to use as global shared library |
 | URL              | Yes      | Public URL that the jenkins is accessible at    |

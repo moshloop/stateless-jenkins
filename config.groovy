@@ -151,8 +151,6 @@ if (REPOS != null) {
         new DslScriptLoader(new JenkinsJobManagement(System.out, [:], new File('.')))
             .runScript("extras.JobBuilder.build(this, '${REPO}', '${DEPLOY_KEY}')")
     }
-
-
 }
 
 
