@@ -45,7 +45,6 @@ COPY plugins.txt $JENKINS_HOME/
 RUN plugins.sh $JENKINS_HOME/plugins.txt
 RUN chown -R jenkins:jenkins $JENKINS_HOME
 USER jenkins
-RUN ansible-provision --install
 ENV JAVA_OPTS="-Dhudson.model.Hudson.killAfterLoad=true"
 # startup jenkins once to create the home directory structure and unpack the plugins
 RUN jenkins.sh
