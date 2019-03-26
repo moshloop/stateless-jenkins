@@ -129,6 +129,7 @@ public class JobBuilder {
         this.job.authorization {
             for (String owner : owners.text.split("\n")) {
                 permission('hudson.model.Item.Build', owner)
+                permission('hudson.model.Item.Read', owner)
             }
         }
         return this
