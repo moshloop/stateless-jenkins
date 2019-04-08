@@ -38,7 +38,7 @@ RUN  BIN=/usr/local/lib/summon install_bin \
         https://github.com/cyberark/summon-aws-secrets/releases/download/v0.1.0/summon-aws-secrets-linux-amd64.tar.gz \
         https://github.com/conjurinc/summon-s3/releases/download/v0.2.0/summon-s3-linux-amd64.tar.gz \
         https://github.com/cyberark/summon-file/releases/download/v0.1.0/summon-file-linux-amd64.tar.gz
-RUN pip install ansible==$ANSIBLE_VERSION ansible-run ansible-provision ansible-deploy ansible-dependencies[all] openpyxl pandas sh
+RUN pip install ansible==$ANSIBLE_VERSION ansible-run ansible-provision==4.1 ansible-deploy ansible-dependencies[all] openpyxl pandas sh
 ENV JENKINS_HOME=/var/jenkins
 RUN usermod -d $JENKINS_HOME jenkins
 COPY plugins.txt $JENKINS_HOME/
