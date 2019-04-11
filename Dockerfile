@@ -2,7 +2,7 @@ FROM jenkins/jenkins:2.153
 ENV JENKINS_VER=$JENKINS_VER
 ENV JENKINS_HOME=/var/jenkins_home
 ENV DOCKER_VER=18.06.0
-ENV K8S_VER=v1.13.3
+ENV K8S_VER=v1.14.0
 ENV ANSIBLE_CONFIG /etc/ansible/ansible.cfg
 ARG ANSIBLE_VERSION=2.6.1
 ARG SYSTOOLS_VERSION=3.6
@@ -26,8 +26,8 @@ RUN install_bin https://github.com/moshloop/db-cli/releases/download/1.2/db-cli 
      install_bin https://github.com/vmware/govmomi/releases/download/v0.18.0/govc_linux_386.gz && \
      install_bin https://github.com/ivanilves/lstags/releases/download/v1.1.0/lstags-linux-v1.1.0.tar.gz && \
      install_bin https://master.dockerproject.org/linux/x86_64/docker && \
-     install_bin https://storage.googleapis.com/kubernetes-release/release/$(K8S_VER)/bin/linux/amd64/kubectl && \
-     install_bin https://storage.googleapis.com/kubernetes-release/release/$(K8S_VER)/bin/linux/amd64/kubeadm && \
+     install_bin https://storage.googleapis.com/kubernetes-release/release/${K8S_VER}/bin/linux/amd64/kubectl && \
+     install_bin https://storage.googleapis.com/kubernetes-release/release/${K8S_VER}/bin/linux/amd64/kubeadm && \
      install_bin https://storage.googleapis.com/kubernetes-helm/helm-v2.11.0-linux-amd64.tar.gz && \
      install_bin https://github.com/kubernetes-sigs/kustomize/releases/download/v1.0.9/kustomize_1.0.9_linux_amd64 && \
      install_bin https://github.com/mayflower/docker-ls/releases/download/v0.3.2/docker-ls-linux-amd64.zip
