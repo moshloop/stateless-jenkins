@@ -48,7 +48,7 @@ RUN chown -R jenkins:jenkins $JENKINS_HOME
 USER jenkins
 ENV JAVA_OPTS="-Dhudson.model.Hudson.killAfterLoad=true"
 # startup jenkins once to create the home directory structure and unpack the plugins
-RUN jenkins.sh
+# RUN jenkins.sh
 ENV JAVA_OPTS="-Djenkins.install.runSetupWizard=false -Dhudson.model.UpdateCenter.never=true"
 COPY config.groovy $JENKINS_HOME/init.groovy.d/
 COPY build/libs/stateless-jenkins-0.0.1.jar  $JENKINS_HOME/war/WEB-INF/lib/
