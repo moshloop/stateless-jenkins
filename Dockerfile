@@ -4,8 +4,8 @@ ENV JENKINS_HOME=/var/jenkins_home
 ENV DOCKER_VER=18.06.0
 ENV K8S_VER=v1.14.0
 ENV ANSIBLE_CONFIG /etc/ansible/ansible.cfg
-ARG ANSIBLE_VERSION=2.6.1
-ARG ANSIBLE_PROVISION_VER=4.3.1
+ARG ANSIBLE_VERSION=2.6.5
+ARG ANSIBLE_PROVISION_VER=4.4.0
 ARG SYSTOOLS_VERSION=3.6
 ENV ANSIBLE_VERSION=$ANSIBLE_VERSION
 ENV DEBIAN_FRONTEND=noninteractive
@@ -48,7 +48,8 @@ RUN chown -R jenkins:jenkins $JENKINS_HOME
 USER jenkins
 ENV JAVA_OPTS="-Dhudson.model.Hudson.killAfterLoad=true"
 # startup jenkins once to create the home directory structure and unpack the plugins
-# RUN jenkins.sh
+RUN jenkins.sh
+RUN ansible --version
 ENV JAVA_OPTS="-Djenkins.install.runSetupWizard=false -Dhudson.model.UpdateCenter.never=true"
 COPY config.groovy $JENKINS_HOME/init.groovy.d/
 COPY build/libs/stateless-jenkins-0.0.1.jar  $JENKINS_HOME/war/WEB-INF/lib/
