@@ -7,22 +7,21 @@ ARG SYSTOOLS_VERSION=3.6
 ENV DEBIAN_FRONTEND=noninteractive
 USER root
 RUN apt-get update && \
-    apt-get install -y python-setuptools python-pip python-dev build-essential jq libkrb5-dev krb5-user wget openssh-client sshpass genisoimage bats git dnsutils nano sudo gnupg2 \
-    libseccomp2 libdevmapper1.02.1 libltdl7 iptables && \
-    rm -Rf /var/lib/apt/lists/*  && \
-    rm -Rf /usr/share/doc && rm -Rf /usr/share/man  && \
-    apt-get clean
+  apt-get install -y python-setuptools python-pip python-dev build-essential jq libkrb5-dev krb5-user wget openssh-client sshpass genisoimage bats git dnsutils nano sudo gnupg2 \
+  libseccomp2 libdevmapper1.02.1 libltdl7 iptables && \
+  rm -Rf /var/lib/apt/lists/*  && \
+  rm -Rf /usr/share/doc && rm -Rf /usr/share/man  && \
+  apt-get clean
 RUN wget https://github.com/moshloop/systools/releases/download/${SYSTOOLS_VERSION}/systools.deb && dpkg -i systools.deb
-RUN install_bin https://github.com/moshloop/db-cli/releases/download/1.3/db-cli  \
-    https://github.com/moshloop/waiter/releases/download/1.1/waiter \
-
-    RUN  install_bin https://github.com/vmware/govmomi/releases/download/v0.18.0/govc_linux_386.gz && \
-    install_bin https://github.com/ivanilves/lstags/releases/download/v1.1.0/lstags-linux-v1.1.0.tar.gz && \
-    install_bin https://master.dockerproject.org/linux/x86_64/docker && \
-    install_bin https://storage.googleapis.com/kubernetes-release/release/${K8S_VER}/bin/linux/amd64/kubectl && \
-    install_bin https://storage.googleapis.com/kubernetes-helm/helm-v2.11.0-linux-amd64.tar.gz && \
-    install_bin https://github.com/kubernetes-sigs/kustomize/releases/download/v1.0.9/kustomize_1.0.9_linux_amd64 && \
-    install_bin https://github.com/mayflower/docker-ls/releases/download/v0.3.2/docker-ls-linux-amd64.zip
+RUN install_bin https://github.com/moshloop/db-cli/releases/download/1.3/db-cli && \
+  install_bin https://github.com/moshloop/waiter/releases/download/1.1/waiter && \
+  install_bin https://github.com/vmware/govmomi/releases/download/v0.18.0/govc_linux_386.gz && \
+  install_bin https://github.com/ivanilves/lstags/releases/download/v1.1.0/lstags-linux-v1.1.0.tar.gz && \
+  install_bin https://master.dockerproject.org/linux/x86_64/docker && \
+  install_bin https://storage.googleapis.com/kubernetes-release/release/${K8S_VER}/bin/linux/amd64/kubectl && \
+  install_bin https://storage.googleapis.com/kubernetes-helm/helm-v2.11.0-linux-amd64.tar.gz && \
+  install_bin https://github.com/kubernetes-sigs/kustomize/releases/download/v1.0.9/kustomize_1.0.9_linux_amd64 && \
+  install_bin https://github.com/mayflower/docker-ls/releases/download/v0.3.2/docker-ls-linux-amd64.zip
 
 ENV JENKINS_HOME=/var/jenkins
 RUN usermod -d $JENKINS_HOME jenkins
