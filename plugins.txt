@@ -94,7 +94,7 @@ jira:3.0.10
 job-dsl:1.76
 job-poll-action-plugin:1.0
 jquery-detached:1.2.1
-jquery:1.11.2-0
+jquery:1.11.2-1
 jsch:0.1.55.1
 junit:1.28
 kubernetes-cd:2.1.2
