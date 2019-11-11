@@ -14,7 +14,7 @@ public class Helpers {
         def ROOT = "/tmp/" + new File(REPO).name.split("\\.")[0] + "/"
         "rm -rf ${ROOT} || echo ok".execute()
         def process = new ProcessBuilder(["bash", "-c",
-            "GIT_SSH_COMMAND='ssh -i ${DEPLOY_KEY} -oStrictHostKeyChecking=no' git clone $REPO $ROOT && git checkout ${branch}".toString()
+            "GIT_SSH_COMMAND='ssh -i ${DEPLOY_KEY} -oStrictHostKeyChecking=no' git clone $REPO $ROOT && git checkout ${branch} && git log --name-only -n 10".toString()
             ])
             .redirectErrorStream(true)
             .start()
@@ -23,10 +23,8 @@ public class Helpers {
         return ROOT
     }
 
-
     static def evalJobDSL(String text){
         def jobManagement = new JenkinsJobManagement(System.out, [:], new File('.'))
         new DslScriptLoader(jobManagement).runScript(text)
     }
-
 }
