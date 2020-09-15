@@ -113,7 +113,7 @@ node-iterator-api:1.5.0
 uno-choice:2.2.1
 pam-auth:1.6
 parameterized-trigger:2.35.2
-pipeline-aws:1.39
+pipeline-aws:1.42
 pipeline-build-step:2.9
 pipeline-github-lib:1.0
 pipeline-graph-analysis:1.10
